@@ -6,7 +6,7 @@ public class BFS{
 
 	public static final int NORTH = 0;
 	public static final int NORTHEAST = 1;
-	private String[][] charmap;
+	private String[][] charmap; 
 	private PlanetMap pm;
 	private GameController gc;
 
@@ -18,25 +18,27 @@ public class BFS{
 		
 	}
 
-	public HashMap<String,Direction> search(MapLocation start, Unit u){
-		long st = System.nanoTime();
+	//Starting location, unit that wants to move, whether or not to do a full search of the map or only enough to path the unit
+	public HashMap<String,Direction> search(MapLocation start, Unit u, boolean full){
+		//we offer the starting location and then fill in all adjacent locations with directions pointing to it
+		//we offer each added location and then poll off the queue and repeat with fillign in adjacent locations
+		
 		LinkedList<MapLocation> locations = new LinkedList<MapLocation>();
 		HashMap<String,Direction> paths = new HashMap<String,Direction>();
+
 		charmap = new String[(int)pm.getWidth()][(int)pm.getHeight()];
 		locations.offer(start);
 		Direction[] directions = Direction.values();
 		VecUnit units = gc.senseNearbyUnits(start,500);
 		ArrayList<String> unitlocs = new ArrayList<String>();
 		for(int i = 0; i < units.size(); i++){
-			if(units.get(i).id()!=u.id())
+			if(u==null||units.get(i).id()!=u.id())
 				unitlocs.add(units.get(i).location().mapLocation().toString());
 		}
-		//System.out.println(unitlocs.size());
-		//System.out.println("BEFORE WHILE");
 		int steps = 0;
 		while(!locations.isEmpty()){
 			if(gc.canSenseLocation(start)&&PathFinder.numAdjacent(start,gc,pm)==0) {
-				//System.out.println("BREAKING");
+			
 				return paths;
 				
 			}
@@ -50,13 +52,11 @@ public class BFS{
 					else if(unitlocs.contains(next.toString())){}
 					else{
 						if (!paths.keySet().contains(next.toString())){
-							//System.out.println(next.getX()+" "+next.getY());
 							locations.offer(next);
 							paths.put(next.toString(),bc.bcDirectionOpposite(d));
 							charmap[(int)next.getX()][(int)next.getY()]=bc.bcDirectionOpposite(d).toString();
-							if(next.toString().equals(u.location().mapLocation().toString())){
-								//System.out.println("Found in " + steps + "steps!");
-								//System.out.println("Time: "+(System.nanoTime()-st)/1000000000.0);
+							if(!full&&next.toString().equals(u.location().mapLocation().toString())){
+								//if the pathing reaches the unit, end the search
 								return paths;
 							}
 						}
@@ -66,12 +66,11 @@ public class BFS{
 			}
 			steps++;
 		}
-		//System.out.println("AFTER WHILE");
 		
 		return paths;
 	}
 
-	public void printMap(){
+	public void printMap(){//used for printing out a representation of the map
 		for(int i = charmap.length-1; i >=0;i--){
 			for(int j = 0; j < charmap[i].length; j++){
 				if(charmap[j][i]!=null){

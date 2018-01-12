@@ -6,14 +6,14 @@ import java.util.Comparator;
 public class Player {
 	public static void main(String[] args){
 
-		// Connect to the manager, starting the game
+		// Initialization
 		GameController gc = new GameController();
-
-        //Scouting the map
 		PlanetMap pm = gc.startingMap(gc.planet());
 
+		//Keeping track of Karbonite
 		ArrayList<MapLocation> karbLocations = new ArrayList<MapLocation>();
-        //Scouting for karbonite
+
+        //Scans map for initial karbonite deposits and records locations
 		for(int x = 0; x < pm.getWidth(); x++)
 			for(int y = 0; y < pm.getHeight(); y++){
 				MapLocation loc = new MapLocation(gc.planet(),x,y);
@@ -21,190 +21,187 @@ public class Player {
 					karbLocations.add(loc);
 			}
 
-			HashMap< String,MapLocation> workerTargets = new HashMap<String,MapLocation>();
-      	//unit list to be constantly updated
-			VecUnit units = gc.myUnits();
+		//Acts like an arraylist of units
+			VecUnit units;
 
+		//Pathing classes for workers
+			BFS workerRally = new BFS(gc);
+		//<MapLocation as a String, direction to go if you're on that MapLocation
+			HashMap<String,Direction> paths;
+
+		//Keeps track of where workers are currently pathing to
+		//<unit id, maplocation to go to>
+			HashMap<Integer,MapLocation> workerTargets = new HashMap<Integer,MapLocation>();
 			int workerCount = 0;
-			for(int i = 0; i < units.size(); i++){
-				Unit u = units.get(i);
-				MapLocation uloc = u.location().mapLocation();
-				Comparator<MapLocation> comp = (loc1,loc2) -> Long.compare(loc1.distanceSquaredTo(uloc),loc2.distanceSquaredTo(uloc));
-				Optional<MapLocation> o = karbLocations.parallelStream().min(comp);
-				if(o.isPresent()){
-
-					workerTargets.put(u.id()+"",o.get());
-					karbLocations.remove(o.get());
-					
-				}
-				workerCount++;
-			}
-
+			
+		//Earth Program
       	if(gc.planet()==Planet.Earth){//=======================EARTH============================================
 
-      		BFS workerRally = new BFS(gc);
-      		HashMap<String,Direction> paths;
-      		
+      		//<blueprint id, # of workers that are assigned it>
       		HashMap<Integer,Integer> bps = new HashMap<Integer,Integer>();
       		int numFactories = 0;
       		
-      		while (true) {
+      		while (true) {// main loop
 
+      			//update units this turn
       			units = gc.myUnits();
+
+      			//printing stuff for debugging
       			System.out.println("Round: " + gc.round());
       			System.out.println("Karbonite: " + gc.karbonite());
       			System.out.println("Units: " + units.size());
+				//workerRally.printMap(); Pathing Map
       			
+      			for(int i = 0; i < units.size(); i++){// looping through units
 
-
-	      		//workerRally.printMap();
-      			for(int i = 0; i < units.size(); i++){
-
+      				//Convenience variables for less typing
       				Unit unit = units.get(i);
       				int id = unit.id();
       				MapLocation loc = unit.location().mapLocation();
+      				
+      				//Current destination of unit, to be set later
       				MapLocation dest = null;
-      				if(unit.unitType() == UnitType.Factory){
-      					if(unit.structureIsBuilt()!=0){
-      						if(bps.keySet().size()>0&&bps.keySet().contains(id)){
+
+      				//Current direction to move in, to be set later
+      				Direction d;
+
+      				if(unit.unitType() == UnitType.Factory){//factory AI
+      					if(unit.structureIsBuilt()!=0){//if structure is finished
+      						if(bps.keySet().size()>0&&bps.keySet().contains(id)){//check the blueprint hashset for this blueprint and remove it
       							bps.remove(id);
-      							System.out.println("REMOVAL==================================================");
       						}
       					}
       				}
+
 	      			if(unit.unitType() == UnitType.Worker){//worker AI
-	      				Direction d;
-	      				if(!workerTargets.keySet().contains(id+"")){//assign a target to a worker
-	      					if(bps.keySet().size()>0){
-	      						VecUnit vec = gc.senseNearbyUnitsByType(loc,50,UnitType.Factory);
+	      				
+	      				if(!workerTargets.keySet().contains(id)){//if a worker doesn't have a target
+
+	      					if(bps.keySet().size()>0){//if there are multiple blueprints to build
+	      						VecUnit vec = gc.senseNearbyUnitsByType(loc,50,UnitType.Factory); //see if there are any nearby to path to
 	      						for(int j = 0; j < vec.size(); j++){
 	      							Unit curr = vec.get(j);
-	      							if(bps.keySet().contains(curr.id()))
-	      								if(bps.get(curr.id())<4){
-	      									workerTargets.put(id+"",curr.location().mapLocation());
+	      							if(bps.keySet().contains(curr.id()))//check to see if this is actually one of our blueprints
+	      								if(bps.get(curr.id())<4){//assign maximum of 4 workers to this blueprint
+	      									workerTargets.put(id,curr.location().mapLocation());
 	      									bps.put(curr.id(),bps.get(curr.id())+1);
-	      									dest = workerTargets.get(id+"");
+	      									dest = workerTargets.get(id);
+	      									break;
 	      								}
+	      							}
 	      						}
-	      					}
-	      					if(dest!=null){}
-
+	      					if(dest!=null){}//checking to see if worker was assigned a destination, if not continue
+	      					
 	      					else if(numFactories<2&&gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Factory)){
+	      						//if we don't have 2 factories and we have enough karbonite to build more, place a blueprint
+	      						
+	      						//find an open space to put a blueprint
 	      						d = PathFinder.findAdjacent(loc,gc,pm);
 	      						if(gc.canBlueprint(id,UnitType.Factory,d)){
 	      							gc.blueprint(id,UnitType.Factory,d);
-	      							workerTargets.put(id+"",loc.add(d));
+	      							workerTargets.put(id,loc.add(d));
 	      							bps.put(gc.senseUnitAtLocation(loc.add(d)).id(),1);
-	      							dest = workerTargets.get(id+"");
+	      							dest = workerTargets.get(id);
 	      							numFactories++;
-	      							System.out.println("BLUEPRINT PLACED ----------------------");
 	      						}
 
 	      					}
-	      					else if(gc.round()<40){
-		      					Comparator<MapLocation> comp = (loc1,loc2) -> Long.compare(loc1.distanceSquaredTo(loc),loc2.distanceSquaredTo(loc));
-		      					Optional<MapLocation> o = karbLocations.parallelStream().min(comp);
-		      					if(o.isPresent()){
-		      						workerTargets.put(id+"",o.get());
-		      						karbLocations.remove(o.get());
-		      						dest = workerTargets.get(id+"");
-		      					}else{
-		      						//System.out.println("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-		      					}
-		      				}else{
+	      					else if(karbLocations.size()>5){//if there is still a decent number of karbonite deposits left, path to them
 
-		      				}
-	      				}else{
-	      					dest = workerTargets.get(id+"");
-
+	      						//find the closest deposit in distance
+	      						Comparator<MapLocation> comp = (loc1,loc2) -> Long.compare(loc1.distanceSquaredTo(loc),loc2.distanceSquaredTo(loc));
+	      						Optional<MapLocation> o = karbLocations.parallelStream().min(comp);
+	      						if(o.isPresent()){
+	      							workerTargets.put(id,o.get());
+	      							karbLocations.remove(o.get());
+	      							dest = workerTargets.get(id);
+	      						}
+	      					}
 	      				}
 	      				
-	      				if(workerCount < 15){//Earlygame
+	      				if(workerCount < 15){//if there are less than 15 workers try to replicate
 
-	      					d = loc.directionTo(dest);
-	      					if(d==Direction.Center||d==null)
-	      						d = PathFinder.findAdjacent(loc,gc,pm);
-	      					if(gc.canReplicate(id,d)){
+	      					//try replicating towards the worker's current destination to save movement
+	      					if(dest!=null){
+	      						d = loc.directionTo(dest);
+	      						if(!gc.canReplicate(id,d)) //if that location is blocked, find an empty one
+	      						d = PathFinder.findAdjacent(loc,gc,pm);	
+	      					}
+	      					else{//if there is no destination, find an adjacent tile
+	      						d = PathFinder.findAdjacent(loc,gc,pm);	
+	      					}
+	      					if(gc.canReplicate(id,d)){//replicate when conditions work out
 	      						if(gc.karbonite()>bc.bcUnitTypeReplicateCost(UnitType.Worker)){
 	      							gc.replicate(id,d);
 	      							workerCount++;
 	      						}
 	      					}
-	      					else{
-	      						
-	      					}
-	      				}//else{
-	      					if(!(dest==null)){
-		      					if(loc.isAdjacentTo(dest)){
-		      						d = loc.directionTo(dest);
-		      						VecUnit vec = gc.senseNearbyUnitsByType(dest,0,UnitType.Factory);
-		      						if(vec.size()>0){
-		      							Unit other = vec.get(0);
-		      							if(other.unitType()==UnitType.Factory){
-		      								if(other.structureIsBuilt()==0){
-		      									if(gc.canBuild(id,other.id())){
-		      										gc.build(id,other.id());
-		      										System.out.println("FACTORY BUILDING ----------------------");
-		      									}
-		      								}else{
-		      									workerTargets.remove(id+"");
-		      								}
-		      								
-		      							}
-
-		      						}
-		      						else if(gc.canHarvest(id,d))
-		      							gc.harvest(id,d);
-		      						else if(gc.karboniteAt(dest)==0){
-		      							workerTargets.remove(id+"");
-		      						}
-		      					}
-		      					else if(loc.directionTo(dest)==Direction.Center)
-		      					{d = loc.directionTo(dest);
-		      						if(gc.canHarvest(id,d))
-		      							gc.harvest(id,d);
-		      						else if(gc.karboniteAt(dest)==0){
-		      							workerTargets.remove(id+"");
-		      						}
-		      					}
-		      					else if(gc.isMoveReady(id)){
-		      						paths = workerRally.search(dest,unit);
-		      						d = paths.get(loc.toString());
-
-		      						 if(paths.keySet().contains(loc.toString()) && gc.canMove(id,d)){
-		      							gc.moveRobot(id,d);
-		      						}else{
-		      							workerTargets.remove(id+"");
-		      							
-		      						}
-		      					}
-		      						
-		      				}
-		      				else{
-		      					d = PathFinder.findAdjacent(loc,gc,pm);
-		      					if(gc.isMoveReady(id)&&gc.canMove(id,d))
-		      						gc.moveRobot(id,d);
-		      				}
-	      					//}
 	      				}
-	      			}
+	      				if(!(dest==null)){//if the worker has a destination
+	      					if(loc.isAdjacentTo(dest)){//check to see if it's next to the destination
+	      					d = loc.directionTo(dest);
+	      					VecUnit vec = gc.senseNearbyUnitsByType(dest,0,UnitType.Factory);
+	      						if(vec.size()>0){//if it's next its factory destination
+	      						Unit other = vec.get(0);
+	      						if(other.unitType()==UnitType.Factory){
+	      								if(other.structureIsBuilt()==0){//if the factory isn't built, build it
+	      								if(gc.canBuild(id,other.id())){
+	      									gc.build(id,other.id());
+	      								}
+	      							}else{
+	      								workerTargets.remove(id);
+	      							}
 
-	      		//end turn
-	      			System.out.println(workerTargets);
-	      			gc.nextTurn();
+	      						}
+
+	      					}
+	      						else if(gc.canHarvest(id,d))//if it can harvest its destination harvest
+	      						gc.harvest(id,d);
+	      						else if(gc.karboniteAt(dest)==0){//if it doesn't have karbonite, reassign worker's target
+	      						workerTargets.remove(id);
+	      					}
+	      				}
+	      					else if(loc.directionTo(dest)==Direction.Center){//if it's on its destination (by replication or otherwise)
+	      					d = loc.directionTo(dest);
+	      							//same as previous harvest
+	      					if(gc.canHarvest(id,d))
+	      						gc.harvest(id,d);
+	      					else if(gc.karboniteAt(dest)==0){
+	      						workerTargets.remove(id);
+	      					}
+	      				}
+	      				else if(gc.isMoveReady(id)){// if the worker is still able to move
+	      					//find a path from worker to target
+	      					paths = workerRally.search(dest,unit,false);
+	      					d = paths.get(loc.toString());
+	      					if(paths.keySet().contains(loc.toString()) && gc.canMove(id,d)){//
+	      						gc.moveRobot(id,d);
+	      					}else{//if it can't get to its destination, remove the destination
+	      						workerTargets.remove(id);
+	      					}
+	      				}
+
+	      			}
+	      			else{//move to any adjacent spot, prioritizing those that are most free
+	      				d = PathFinder.findAdjacent(loc,gc,pm);
+	      				if(gc.isMoveReady(id)&&gc.canMove(id,d))
+	      					gc.moveRobot(id,d);
+	      			}
 
 	      		}
 	      	}
 
+	      	//ending turn
+	      	gc.nextTurn();
+
+
+	      }
+	  }
+
       	else{//===============================================MARS=============================================
-
       		while (true) {
-
       			gc.nextTurn();
-
       		}
-
       	}
-
       }
   }
