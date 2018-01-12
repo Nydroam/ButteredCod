@@ -1,26 +1,44 @@
 import bc.*;
 import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.Comparator;
 public class Player {
 	public static void main(String[] args){
 
 		// Connect to the manager, starting the game
-        GameController gc = new GameController();
+		GameController gc = new GameController();
 
         //Scouting the map
-        PlanetMap pm = gc.startingMap(gc.planet());
+		PlanetMap pm = gc.startingMap(gc.planet());
 
+		ArrayList<MapLocation> karbLocations = new ArrayList<MapLocation>();
+        //Scouting for karbonite
+		for(int x = 0; x < pm.getWidth(); x++)
+			for(int y = 0; y < pm.getHeight(); y++){
+				MapLocation loc = new MapLocation(gc.planet(),x,y);
+				if(pm.initialKarboniteAt(loc)>0)
+					karbLocations.add(loc);
+			}
 
-
-        //for(int x = 0; x < pm.getWidth(); x++)
-        	//for(int y = 0; y < pm.getHeight(); y++)
-        		//System.out.println(pm.isPassableTerrainAt(new MapLocation(gc.planet(),x,y)));
-      	
+			HashMap< String,MapLocation> workerTargets = new HashMap<String,MapLocation>();
       	//unit list to be constantly updated
-      	VecUnit units = gc.myUnits();
+			VecUnit units = gc.myUnits();
 
-      	int workerCount = 0;
-      	for(int i = 0; i < units.size(); i++)
-      		workerCount++;
+			int workerCount = 0;
+			for(int i = 0; i < units.size(); i++){
+				Unit u = units.get(i);
+				MapLocation uloc = u.location().mapLocation();
+				Comparator<MapLocation> comp = (loc1,loc2) -> Long.compare(loc1.distanceSquaredTo(uloc),loc2.distanceSquaredTo(uloc));
+				Optional<MapLocation> o = karbLocations.parallelStream().min(comp);
+				if(o.isPresent()){
+
+					workerTargets.put(u.id()+"",o.get());
+					karbLocations.remove(o.get());
+					
+				}
+				workerCount++;
+			}
 
       	if(gc.planet()==Planet.Earth){//=======================EARTH============================================
 
@@ -28,54 +46,96 @@ public class Player {
       		HashMap<String,Direction> paths;
       		
 
-	      	while (true) {
 
-	      		units = gc.myUnits();
-	      		System.out.println("Round: " + gc.round());
-	      		MapLocation dest = new MapLocation(gc.planet(),10,10);
-	      		
-	      		paths = workerRally.search(dest,null);
+      		
+      		while (true) {
+
+      			units = gc.myUnits();
+      			System.out.println("Round: " + gc.round());
+      			System.out.println("Karbonite: " + gc.karbonite());
+      			System.out.println("Units: " + units.size());
+      			
+
+
 	      		//workerRally.printMap();
-	      		for(int i = 0; i < units.size(); i++){
-	      				
-	      			Unit unit = units.get(i);
-	      			
+      			for(int i = 0; i < units.size(); i++){
+
+      				Unit unit = units.get(i);
+      				int id = unit.id();
+      				MapLocation loc = unit.location().mapLocation();
+      				MapLocation dest = null;
 	      			if(unit.unitType() == UnitType.Worker){//worker AI
-	      				Direction d = PathFinder.findAdjacent(unit.location().mapLocation(),gc,pm);
-	      				if(workerCount < 10){//Earlygame
+	      				if(!workerTargets.keySet().contains(id+"")){//assign a target to a worker
 	      					
-	      					if(gc.canReplicate(unit.id(),d)&&gc.karbonite()>bc.bcUnitTypeReplicateCost(UnitType.Worker)){
-	      						gc.replicate(unit.id(),d);
-	      						workerCount++;
+	      					Comparator<MapLocation> comp = (loc1,loc2) -> Long.compare(loc1.distanceSquaredTo(loc),loc2.distanceSquaredTo(loc));
+	      					Optional<MapLocation> o = karbLocations.parallelStream().min(comp);
+	      					if(o.isPresent()){
+	      						workerTargets.put(id+"",o.get());
+	      						karbLocations.remove(o.get());
+	      						dest = workerTargets.get(id+"");
 	      					}else{
-	      						//if(gc.isMoveReady(unit.id()) && gc.canMove(unit.id(),d))
-	      							//gc.moveRobot(unit.id(),paths.get(dest));
+	      						//System.out.println("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
 	      					}
 	      				}else{
-	      					//System.out.println(unit.location().mapLocation().toString());
-	      					if(gc.isMoveReady(unit.id()) && paths.keySet().contains(unit.location().mapLocation().toString()) && gc.canMove(unit.id(),paths.get(unit.location().mapLocation().toString()))){
-	      						gc.moveRobot(unit.id(),paths.get(unit.location().mapLocation().toString()));
+	      					dest = workerTargets.get(id+"");
+
+	      				}
+	      				Direction d;
+	      				if(workerCount < 10){//Earlygame
+
+	      					d = loc.directionTo(dest);
+	      					if(d==Direction.Center||d==null)
+	      						d = PathFinder.findAdjacent(loc,gc,pm);
+	      					if(gc.canReplicate(id,d)){
+	      						if(gc.karbonite()>bc.bcUnitTypeReplicateCost(UnitType.Worker)){
+	      							gc.replicate(id,d);
+	      							workerCount++;
+	      						}
+	      					}
+	      					else{
 	      						
 	      					}
+	      				}//else{
+	      					if(!(dest==null)){
+		      					if(loc.isAdjacentTo(dest)||loc.toString().equals(dest.toString())){
+		      						d = loc.directionTo(dest);
+		      						if(gc.canHarvest(id,d))
+		      							gc.harvest(id,d);
+		      						else if(gc.karboniteAt(dest)==0){
+		      							workerTargets.remove(id+"");
+		      							//System.out.println("Done Mining!");
+		      						}
+		      					}
+		      					else if(gc.isMoveReady(id)){
+		      						paths = workerRally.search(dest,unit);
+		      						d = paths.get(loc.toString());
+		      						if(paths.keySet().contains(loc.toString()) && gc.canMove(id,d)){
+		      							gc.moveRobot(id,d);
+		      						}
+		      					}
+		      						
+		      				}
+
+	      					//}
 	      				}
 	      			}
-	      		}
-	      		
-	      		//end turn
-	      		gc.nextTurn();
 
+	      		//end turn
+	      			//System.out.println(workerTargets);
+	      			gc.nextTurn();
+
+	      		}
 	      	}
-	    }
 
       	else{//===============================================MARS=============================================
 
       		while (true) {
 
-	      		gc.nextTurn();
+      			gc.nextTurn();
 
-	      	}
+      		}
 
       	}
 
-	}
-}
+      }
+  }

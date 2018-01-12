@@ -31,7 +31,7 @@ public class PathFinder{
 		for(int i = 0; i < directions.length; i++)
 			if(directions[i]!=Direction.Center){
 				MapLocation newl = l.add(directions[i]);
-				if(pm.onMap(newl)&&gc.isOccupiable(newl)!=0)
+				if(gc.canSenseLocation(newl)&&pm.onMap(newl)&&gc.isOccupiable(newl)!=0)
 					num++;
 			}
 		return num;
