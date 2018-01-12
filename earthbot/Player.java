@@ -45,8 +45,8 @@ public class Player {
       		BFS workerRally = new BFS(gc);
       		HashMap<String,Direction> paths;
       		
-
-
+      		HashMap<Integer,Integer> bps = new HashMap<Integer,Integer>();
+      		int numFactories = 0;
       		
       		while (true) {
 
@@ -64,24 +64,62 @@ public class Player {
       				int id = unit.id();
       				MapLocation loc = unit.location().mapLocation();
       				MapLocation dest = null;
+      				if(unit.unitType() == UnitType.Factory){
+      					if(unit.structureIsBuilt()!=0){
+      						if(bps.keySet().size()>0&&bps.keySet().contains(id)){
+      							bps.remove(id);
+      							System.out.println("REMOVAL==================================================");
+      						}
+      					}
+      				}
 	      			if(unit.unitType() == UnitType.Worker){//worker AI
+	      				Direction d;
 	      				if(!workerTargets.keySet().contains(id+"")){//assign a target to a worker
-	      					
-	      					Comparator<MapLocation> comp = (loc1,loc2) -> Long.compare(loc1.distanceSquaredTo(loc),loc2.distanceSquaredTo(loc));
-	      					Optional<MapLocation> o = karbLocations.parallelStream().min(comp);
-	      					if(o.isPresent()){
-	      						workerTargets.put(id+"",o.get());
-	      						karbLocations.remove(o.get());
-	      						dest = workerTargets.get(id+"");
-	      					}else{
-	      						//System.out.println("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+	      					if(bps.keySet().size()>0){
+	      						VecUnit vec = gc.senseNearbyUnitsByType(loc,50,UnitType.Factory);
+	      						for(int j = 0; j < vec.size(); j++){
+	      							Unit curr = vec.get(j);
+	      							if(bps.keySet().contains(curr.id()))
+	      								if(bps.get(curr.id())<4){
+	      									workerTargets.put(id+"",curr.location().mapLocation());
+	      									bps.put(curr.id(),bps.get(curr.id())+1);
+	      									dest = workerTargets.get(id+"");
+	      								}
+	      						}
 	      					}
+	      					if(dest!=null){}
+
+	      					else if(numFactories<2&&gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Factory)){
+	      						d = PathFinder.findAdjacent(loc,gc,pm);
+	      						if(gc.canBlueprint(id,UnitType.Factory,d)){
+	      							gc.blueprint(id,UnitType.Factory,d);
+	      							workerTargets.put(id+"",loc.add(d));
+	      							bps.put(gc.senseUnitAtLocation(loc.add(d)).id(),1);
+	      							dest = workerTargets.get(id+"");
+	      							numFactories++;
+	      							System.out.println("BLUEPRINT PLACED ----------------------");
+	      						}
+
+	      					}
+	      					else if(gc.round()<40){
+		      					Comparator<MapLocation> comp = (loc1,loc2) -> Long.compare(loc1.distanceSquaredTo(loc),loc2.distanceSquaredTo(loc));
+		      					Optional<MapLocation> o = karbLocations.parallelStream().min(comp);
+		      					if(o.isPresent()){
+		      						workerTargets.put(id+"",o.get());
+		      						karbLocations.remove(o.get());
+		      						dest = workerTargets.get(id+"");
+		      					}else{
+		      						//System.out.println("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+		      					}
+		      				}else{
+
+		      				}
 	      				}else{
 	      					dest = workerTargets.get(id+"");
 
 	      				}
-	      				Direction d;
-	      				if(workerCount < 10){//Earlygame
+	      				
+	      				if(workerCount < 15){//Earlygame
 
 	      					d = loc.directionTo(dest);
 	      					if(d==Direction.Center||d==null)
@@ -97,31 +135,62 @@ public class Player {
 	      					}
 	      				}//else{
 	      					if(!(dest==null)){
-		      					if(loc.isAdjacentTo(dest)||loc.toString().equals(dest.toString())){
+		      					if(loc.isAdjacentTo(dest)){
 		      						d = loc.directionTo(dest);
+		      						VecUnit vec = gc.senseNearbyUnitsByType(dest,0,UnitType.Factory);
+		      						if(vec.size()>0){
+		      							Unit other = vec.get(0);
+		      							if(other.unitType()==UnitType.Factory){
+		      								if(other.structureIsBuilt()==0){
+		      									if(gc.canBuild(id,other.id())){
+		      										gc.build(id,other.id());
+		      										System.out.println("FACTORY BUILDING ----------------------");
+		      									}
+		      								}else{
+		      									workerTargets.remove(id+"");
+		      								}
+		      								
+		      							}
+
+		      						}
+		      						else if(gc.canHarvest(id,d))
+		      							gc.harvest(id,d);
+		      						else if(gc.karboniteAt(dest)==0){
+		      							workerTargets.remove(id+"");
+		      						}
+		      					}
+		      					else if(loc.directionTo(dest)==Direction.Center)
+		      					{d = loc.directionTo(dest);
 		      						if(gc.canHarvest(id,d))
 		      							gc.harvest(id,d);
 		      						else if(gc.karboniteAt(dest)==0){
 		      							workerTargets.remove(id+"");
-		      							//System.out.println("Done Mining!");
 		      						}
 		      					}
 		      					else if(gc.isMoveReady(id)){
 		      						paths = workerRally.search(dest,unit);
 		      						d = paths.get(loc.toString());
-		      						if(paths.keySet().contains(loc.toString()) && gc.canMove(id,d)){
+
+		      						 if(paths.keySet().contains(loc.toString()) && gc.canMove(id,d)){
 		      							gc.moveRobot(id,d);
+		      						}else{
+		      							workerTargets.remove(id+"");
+		      							
 		      						}
 		      					}
 		      						
 		      				}
-
+		      				else{
+		      					d = PathFinder.findAdjacent(loc,gc,pm);
+		      					if(gc.isMoveReady(id)&&gc.canMove(id,d))
+		      						gc.moveRobot(id,d);
+		      				}
 	      					//}
 	      				}
 	      			}
 
 	      		//end turn
-	      			//System.out.println(workerTargets);
+	      			System.out.println(workerTargets);
 	      			gc.nextTurn();
 
 	      		}

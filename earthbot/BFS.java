@@ -42,7 +42,7 @@ public class BFS{
 			}
 			MapLocation current = locations.poll();
 			for(Direction d : directions){
-				if(d != Direction.Center){
+				if(d != null){
 					MapLocation next = current.add(d);
 					if(!pm.onMap(next)){}
 					else if(pm.isPassableTerrainAt(next)==0){}
