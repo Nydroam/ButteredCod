@@ -1,5 +1,6 @@
 import bc.*;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 public class PathFinder{
 
 	//find an adjacent Direction given a Maplocation, prioritizing 
@@ -37,5 +38,9 @@ public class PathFinder{
 		return num;
 	}
 			
-	
+	public static Direction tryRotate(Direction d, int i){
+		ArrayList<Direction> dirList = new ArrayList<Direction>(Arrays.asList(Direction.values()));
+		dirList.remove(Direction.Center);
+		return dirList.get((dirList.indexOf(d)+i+dirList.size())%dirList.size());
+	}
 }

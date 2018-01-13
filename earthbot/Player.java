@@ -13,9 +13,6 @@ public class Player {
 
 		MapLocation test2 = new MapLocation(gc.planet(),11,12);
 
-		System.out.println("THIS DIRECTION: " + test1.directionTo(test2));
-		
-
 		//Keeping track of Karbonite
 		ArrayList<MapLocation> karbLocations = new ArrayList<MapLocation>();
 
@@ -34,7 +31,7 @@ public class Player {
             enemyTeam = Team.Blue;
 
 		//Acts like an arraylist of units
-		VecUnit units;
+		VecUnit units = gc.myUnits();
 
 		//Pathing class
 			BFS rally = new BFS(gc);
@@ -44,7 +41,7 @@ public class Player {
 		//Keeps track of where workers are currently pathing to
 		//<unit id, maplocation to go to>
 			HashMap<Integer,MapLocation> workerTargets = new HashMap<Integer,MapLocation>();
-			int workerCount = 0;
+			int workerCount = (int)units.size();
 			
 		//Earth Program
       	if(gc.planet()==Planet.Earth){//=======================EARTH============================================
@@ -123,11 +120,21 @@ public class Player {
 	      					else if(gc.isMoveReady(id)&&gc.canMove(id,d))
 	      						gc.moveRobot(id,d);
 	      					else{
+	      						int[] turns = {-1,1,-2,2};
+	      						for(int j = 0; j < turns.length; j++){
+	      							Direction newd = PathFinder.tryRotate(d,turns[j]);
+	      							if(gc.isMoveReady(id)&&gc.canMove(id,newd)){
+	      								gc.moveRobot(id,newd);
+	      								break;
+	      							}
+	      						}
+	      						if(gc.isMoveReady(id)){
 	      						paths = rally.search(dest,unit,false);
 	      						
 	      						d = paths.get(loc.toString());
-	      					if(paths.keySet().contains(loc.toString())&&gc.isMoveReady(id)&&gc.canMove(id,d))
+	      					if(paths.keySet().contains(loc.toString())&&gc.canMove(id,d))
 	      						gc.moveRobot(id,d);
+	      				}
 	      					}
 
 							//look for a nearby close enemy
@@ -156,7 +163,7 @@ public class Player {
 	      						for(int j = 0; j < vec.size(); j++){
 	      							Unit curr = vec.get(j);
 	      							if(bps.keySet().contains(curr.id()))//check to see if this is actually one of our blueprints
-	      								if(bps.get(curr.id())<3){//assign maximum of 4 workers to this blueprint
+	      								if(bps.get(curr.id())<5){//assign maximum of 4 workers to this blueprint
 	      									workerTargets.put(id,curr.location().mapLocation());
 	      									bps.put(curr.id(),bps.get(curr.id())+1);
 	      									dest = workerTargets.get(id);
@@ -192,13 +199,12 @@ public class Player {
 	      						}
 	      					}
 	      					else{
-	      						gc.disintegrateUnit(id);
 	      					}
 	      				}else{
 	      					dest = workerTargets.get(id);
 	      				}
 	      				
-	      				if(workerCount < 10){//if there are less than 15 workers try to replicate
+	      				if(workerCount < 15){//if there are less than 15 workers try to replicate
 
 	      					//try replicating towards the worker's current destination to save movement
 	      					if(dest!=null){
