@@ -22,7 +22,7 @@ public class BFS{
 	public HashMap<String,Direction> search(MapLocation start, Unit u, boolean full){
 		//we offer the starting location and then fill in all adjacent locations with directions pointing to it
 		//we offer each added location and then poll off the queue and repeat with fillign in adjacent locations
-		
+
 		LinkedList<MapLocation> locations = new LinkedList<MapLocation>();
 		HashMap<String,Direction> paths = new HashMap<String,Direction>();
 
@@ -36,7 +36,7 @@ public class BFS{
 				unitlocs.add(units.get(i).location().mapLocation().toString());
 		}
 		int steps = 0;
-		while(!locations.isEmpty()){
+		while(!locations.isEmpty()&&steps<150){
 			if(gc.canSenseLocation(start)&&PathFinder.numAdjacent(start,gc,pm)==0) {
 			
 				return paths;
@@ -66,7 +66,7 @@ public class BFS{
 			}
 			steps++;
 		}
-		
+		System.out.println("Steps:"+steps);
 		return paths;
 	}
 

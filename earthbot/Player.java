@@ -13,6 +13,8 @@ public class Player {
 		//Keeping track of Karbonite
 		ArrayList<MapLocation> karbLocations = new ArrayList<MapLocation>();
 
+		for(Direction d: Direction.values())
+			System.out.println(d);
         //Scans map for initial karbonite deposits and records locations
 		for(int x = 0; x < pm.getWidth(); x++)
 			for(int y = 0; y < pm.getHeight(); y++){
@@ -21,11 +23,16 @@ public class Player {
 					karbLocations.add(loc);
 			}
 
-		//Acts like an arraylist of units
-			VecUnit units;
+		//ENEMY
+		Team enemyTeam = Team.Red;
+		if(gc.team()==Team.Red)
+            enemyTeam = Team.Blue;
 
-		//Pathing classes for workers
-			BFS workerRally = new BFS(gc);
+		//Acts like an arraylist of units
+		VecUnit units;
+
+		//Pathing class
+			BFS rally = new BFS(gc);
 		//<MapLocation as a String, direction to go if you're on that MapLocation
 			HashMap<String,Direction> paths;
 
@@ -50,14 +57,19 @@ public class Player {
       			System.out.println("Round: " + gc.round());
       			System.out.println("Karbonite: " + gc.karbonite());
       			System.out.println("Units: " + units.size());
-				//workerRally.printMap(); Pathing Map
+				//rally.printMap(); Pathing Map
       			
       			for(int i = 0; i < units.size(); i++){// looping through units
 
       				//Convenience variables for less typing
       				Unit unit = units.get(i);
       				int id = unit.id();
+
+      				if(unit.location().isInGarrison()){
+      					continue;
+      				}
       				MapLocation loc = unit.location().mapLocation();
+      				
       				
       				//Current destination of unit, to be set later
       				MapLocation dest = null;
@@ -70,7 +82,62 @@ public class Player {
       						if(bps.keySet().size()>0&&bps.keySet().contains(id)){//check the blueprint hashset for this blueprint and remove it
       							bps.remove(id);
       						}
+
+      						if(gc.karbonite()>bc.bcUnitTypeFactoryCost(UnitType.Knight)&&gc.canProduceRobot(id,UnitType.Knight)){//making knights
+      							gc.produceRobot(id,UnitType.Knight);
+      						}
+      						d = PathFinder.findAdjacent(loc,gc,pm);	
+      						if(gc.canUnload(id,d))
+      							gc.unload(id,d);
+
       					}
+      				}
+
+      				if(unit.unitType() == UnitType.Knight){//knight AI
+      					VecUnit vec = gc.senseNearbyUnitsByTeam(loc,200,enemyTeam);
+      					Unit enemy = null;
+      					Unit close;
+      					if(vec.size()>0){
+      						 enemy = vec.get(0);
+      						dest = enemy.location().mapLocation();
+      					}
+      					
+      					if(dest!=null){
+	      					d = loc.directionTo(dest);
+	      					
+	      					//look for a nearby close enemy
+	      					vec = gc.senseNearbyUnitsByTeam(loc,1,enemyTeam);
+	      					close = null;
+	      					if(vec.size()>0)
+	      						close = vec.get(0);
+
+							if(close!=null&&gc.isAttackReady(id)&&gc.canAttack(id,enemy.id()))
+	      						gc.attack(id,enemy.id());
+
+	      					//move toward a target
+	      					if(gc.isMoveReady(id)&&gc.canMove(id,d))
+	      						gc.moveRobot(id,d);
+	      					else{
+	      						d = PathFinder.findAdjacent(loc,gc,pm);
+	      					if(gc.isMoveReady(id)&&gc.canMove(id,d))
+	      						gc.moveRobot(id,d);
+	      					}
+
+							//look for a nearby close enemy
+	      					vec = gc.senseNearbyUnitsByTeam(loc,1,enemyTeam);
+	      					close = null;
+	      					if(vec.size()>0)
+	      						close = vec.get(0);
+
+	      					if(close!=null&&gc.isAttackReady(id)&&gc.canAttack(id,enemy.id()))
+	      						gc.attack(id,enemy.id());
+	      					//attack target if in range
+	      					if(enemy!=null&&gc.isAttackReady(id)&&gc.canAttack(id,enemy.id()))
+	      						gc.attack(id,enemy.id());
+
+	      				}else{
+	      					
+	      				}
       				}
 
 	      			if(unit.unitType() == UnitType.Worker){//worker AI
@@ -82,7 +149,7 @@ public class Player {
 	      						for(int j = 0; j < vec.size(); j++){
 	      							Unit curr = vec.get(j);
 	      							if(bps.keySet().contains(curr.id()))//check to see if this is actually one of our blueprints
-	      								if(bps.get(curr.id())<4){//assign maximum of 4 workers to this blueprint
+	      								if(bps.get(curr.id())<3){//assign maximum of 4 workers to this blueprint
 	      									workerTargets.put(id,curr.location().mapLocation());
 	      									bps.put(curr.id(),bps.get(curr.id())+1);
 	      									dest = workerTargets.get(id);
@@ -117,15 +184,17 @@ public class Player {
 	      							dest = workerTargets.get(id);
 	      						}
 	      					}
+	      				}else{
+	      					dest = workerTargets.get(id);
 	      				}
 	      				
-	      				if(workerCount < 15){//if there are less than 15 workers try to replicate
+	      				if(workerCount < 10){//if there are less than 15 workers try to replicate
 
 	      					//try replicating towards the worker's current destination to save movement
 	      					if(dest!=null){
 	      						d = loc.directionTo(dest);
 	      						if(!gc.canReplicate(id,d)) //if that location is blocked, find an empty one
-	      						d = PathFinder.findAdjacent(loc,gc,pm);	
+	      							d = PathFinder.findAdjacent(loc,gc,pm);	
 	      					}
 	      					else{//if there is no destination, find an adjacent tile
 	      						d = PathFinder.findAdjacent(loc,gc,pm);	
@@ -137,30 +206,32 @@ public class Player {
 	      						}
 	      					}
 	      				}
+
 	      				if(!(dest==null)){//if the worker has a destination
+
 	      					if(loc.isAdjacentTo(dest)){//check to see if it's next to the destination
-	      					d = loc.directionTo(dest);
-	      					VecUnit vec = gc.senseNearbyUnitsByType(dest,0,UnitType.Factory);
-	      						if(vec.size()>0){//if it's next its factory destination
-	      						Unit other = vec.get(0);
-	      						if(other.unitType()==UnitType.Factory){
-	      								if(other.structureIsBuilt()==0){//if the factory isn't built, build it
-	      								if(gc.canBuild(id,other.id())){
-	      									gc.build(id,other.id());
-	      								}
-	      							}else{
-	      								workerTargets.remove(id);
-	      							}
+		      					d = loc.directionTo(dest);
+		      					VecUnit vec = gc.senseNearbyUnitsByType(dest,0,UnitType.Factory);
+		      						if(vec.size()>0){//if it's next its factory destination
+			      						Unit other = vec.get(0);
+			      						if(other.unitType()==UnitType.Factory){
+			      								if(other.structureIsBuilt()==0){//if the factory isn't built, build it
+			      								if(gc.canBuild(id,other.id())){
+			      									gc.build(id,other.id());
+			      								}
+			      							}else{
+			      								workerTargets.remove(id);
+			      							}
 
-	      						}
+			      						}
+
+		      						}
+		      						else if(gc.canHarvest(id,d))//if it can harvest its destination harvest
+		      							gc.harvest(id,d);
+		      						else if(gc.karboniteAt(dest)==0)//if it doesn't have karbonite, reassign worker's target
+		      							workerTargets.remove(id);
 
 	      					}
-	      						else if(gc.canHarvest(id,d))//if it can harvest its destination harvest
-	      						gc.harvest(id,d);
-	      						else if(gc.karboniteAt(dest)==0){//if it doesn't have karbonite, reassign worker's target
-	      						workerTargets.remove(id);
-	      					}
-	      				}
 	      					else if(loc.directionTo(dest)==Direction.Center){//if it's on its destination (by replication or otherwise)
 	      					d = loc.directionTo(dest);
 	      							//same as previous harvest
@@ -172,25 +243,23 @@ public class Player {
 	      				}
 	      				else if(gc.isMoveReady(id)){// if the worker is still able to move
 	      					//find a path from worker to target
-	      					paths = workerRally.search(dest,unit,false);
+	      					paths = rally.search(dest,unit,false);
 	      					d = paths.get(loc.toString());
 	      					if(paths.keySet().contains(loc.toString()) && gc.canMove(id,d)){//
 	      						gc.moveRobot(id,d);
 	      					}else{//if it can't get to its destination, remove the destination
-	      						workerTargets.remove(id);
-	      					}
+	      					workerTargets.remove(id);
 	      				}
-
 	      			}
-	      			else{//move to any adjacent spot, prioritizing those that are most free
-	      				d = PathFinder.findAdjacent(loc,gc,pm);
-	      				if(gc.isMoveReady(id)&&gc.canMove(id,d))
-	      					gc.moveRobot(id,d);
+
+	      		}
+	      			else{//last thing to check
+	      			
 	      			}
 
 	      		}
 	      	}
-
+	      	
 	      	//ending turn
 	      	gc.nextTurn();
 
