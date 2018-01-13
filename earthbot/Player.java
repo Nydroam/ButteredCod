@@ -5,16 +5,21 @@ import java.util.Optional;
 import java.util.Comparator;
 public class Player {
 	public static void main(String[] args){
-
-		// Initialization
+// Initialization
 		GameController gc = new GameController();
 		PlanetMap pm = gc.startingMap(gc.planet());
+
+		MapLocation test1 = new MapLocation(gc.planet(),10,10);
+
+		MapLocation test2 = new MapLocation(gc.planet(),11,12);
+
+		System.out.println("THIS DIRECTION: " + test1.directionTo(test2));
+		
 
 		//Keeping track of Karbonite
 		ArrayList<MapLocation> karbLocations = new ArrayList<MapLocation>();
 
-		for(Direction d: Direction.values())
-			System.out.println(d);
+		
         //Scans map for initial karbonite deposits and records locations
 		for(int x = 0; x < pm.getWidth(); x++)
 			for(int y = 0; y < pm.getHeight(); y++){
@@ -83,8 +88,8 @@ public class Player {
       							bps.remove(id);
       						}
 
-      						if(gc.karbonite()>bc.bcUnitTypeFactoryCost(UnitType.Knight)&&gc.canProduceRobot(id,UnitType.Knight)){//making knights
-      							gc.produceRobot(id,UnitType.Knight);
+      						if(gc.karbonite()>bc.bcUnitTypeFactoryCost(UnitType.Ranger)&&gc.canProduceRobot(id,UnitType.Ranger)){//making Rangers
+      							gc.produceRobot(id,UnitType.Ranger);
       						}
       						d = PathFinder.findAdjacent(loc,gc,pm);	
       						if(gc.canUnload(id,d))
@@ -93,8 +98,8 @@ public class Player {
       					}
       				}
 
-      				if(unit.unitType() == UnitType.Knight){//knight AI
-      					VecUnit vec = gc.senseNearbyUnitsByTeam(loc,200,enemyTeam);
+      				if(unit.unitType() == UnitType.Ranger){//Ranger AI
+      					VecUnit vec = gc.senseNearbyUnitsByTeam(loc,400,enemyTeam);
       					Unit enemy = null;
       					Unit close;
       					if(vec.size()>0){
@@ -106,31 +111,33 @@ public class Player {
 	      					d = loc.directionTo(dest);
 	      					
 	      					//look for a nearby close enemy
-	      					vec = gc.senseNearbyUnitsByTeam(loc,1,enemyTeam);
+	      					vec = gc.senseNearbyUnitsByTeam(loc,50,enemyTeam);
 	      					close = null;
 	      					if(vec.size()>0)
 	      						close = vec.get(0);
 
-							if(close!=null&&gc.isAttackReady(id)&&gc.canAttack(id,enemy.id()))
-	      						gc.attack(id,enemy.id());
+							if(close!=null&&gc.isAttackReady(id)&&gc.canAttack(id,close.id()))
+	      						gc.attack(id,close.id());
 
 	      					//move toward a target
-	      					if(gc.isMoveReady(id)&&gc.canMove(id,d))
+	      					else if(gc.isMoveReady(id)&&gc.canMove(id,d))
 	      						gc.moveRobot(id,d);
 	      					else{
-	      						d = PathFinder.findAdjacent(loc,gc,pm);
-	      					if(gc.isMoveReady(id)&&gc.canMove(id,d))
+	      						paths = rally.search(dest,unit,false);
+	      						
+	      						d = paths.get(loc.toString());
+	      					if(paths.keySet().contains(loc.toString())&&gc.isMoveReady(id)&&gc.canMove(id,d))
 	      						gc.moveRobot(id,d);
 	      					}
 
 							//look for a nearby close enemy
-	      					vec = gc.senseNearbyUnitsByTeam(loc,1,enemyTeam);
+	      					vec = gc.senseNearbyUnitsByTeam(loc,50,enemyTeam);
 	      					close = null;
 	      					if(vec.size()>0)
 	      						close = vec.get(0);
 
-	      					if(close!=null&&gc.isAttackReady(id)&&gc.canAttack(id,enemy.id()))
-	      						gc.attack(id,enemy.id());
+	      					if(close!=null&&gc.isAttackReady(id)&&gc.canAttack(id,close.id()))
+	      						gc.attack(id,close.id());
 	      					//attack target if in range
 	      					if(enemy!=null&&gc.isAttackReady(id)&&gc.canAttack(id,enemy.id()))
 	      						gc.attack(id,enemy.id());
@@ -173,7 +180,7 @@ public class Player {
 	      						}
 
 	      					}
-	      					else if(karbLocations.size()>5){//if there is still a decent number of karbonite deposits left, path to them
+	      					else if(karbLocations.size()>20){//if there is still a decent number of karbonite deposits left, path to them
 
 	      						//find the closest deposit in distance
 	      						Comparator<MapLocation> comp = (loc1,loc2) -> Long.compare(loc1.distanceSquaredTo(loc),loc2.distanceSquaredTo(loc));
@@ -183,6 +190,9 @@ public class Player {
 	      							karbLocations.remove(o.get());
 	      							dest = workerTargets.get(id);
 	      						}
+	      					}
+	      					else{
+	      						gc.disintegrateUnit(id);
 	      					}
 	      				}else{
 	      					dest = workerTargets.get(id);

@@ -36,7 +36,7 @@ public class BFS{
 				unitlocs.add(units.get(i).location().mapLocation().toString());
 		}
 		int steps = 0;
-		while(!locations.isEmpty()&&steps<150){
+		while(!locations.isEmpty()){
 			if(gc.canSenseLocation(start)&&PathFinder.numAdjacent(start,gc,pm)==0) {
 			
 				return paths;
