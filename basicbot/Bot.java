@@ -45,4 +45,22 @@ public class Bot{
 		}
 		return false;
 	}
+	public Unit enemyAtRange(long radius){
+		Team enemyTeam = Team.Red;
+		if(gc.team()==Team.Red)
+            enemyTeam = Team.Blue;
+        VecUnit vec = gc.senseNearbyUnitsByTeam(loc,radius,enemyTeam);
+        if(vec.size()>0){
+
+        	for(int i = 0; i < vec.size(); i++){
+        		UnitType ut = vec.get(i).unitType();
+        		if(ut==UnitType.Ranger||ut==UnitType.Mage)
+        			return vec.get(i);
+        		if(ut==UnitType.Factory||ut==UnitType.Rocket)
+        			return vec.get(i);
+        	}
+        	return vec.get(0);
+        }
+        return null;
+	}
 }

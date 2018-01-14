@@ -4,47 +4,62 @@ public class Player{
 	public static void main(String[] args){
 
 		//Game Initialization
+		long start = System.currentTimeMillis();
+		long time;
 		GameController gc = new GameController();
+		time = System.currentTimeMillis()-start;
+        System.out.println("After gc: "+time/1000.0 + "s");
 		PlanetMap pm = gc.startingMap(gc.planet());
 
 		//Variable Initialization
 		Logistics logs = new Logistics(gc,pm);
 		VecUnit units=logs.units();;
 		//Enemy Team
-		Team enemyTeam = Team.Red;
-		if(gc.team()==Team.Red)
-            enemyTeam = Team.Blue;
-
-        
+		
+		
+		gc.queueResearch(UnitType.Ranger);
+		gc.queueResearch(UnitType.Knight);
+		
 		if(gc.planet()==Planet.Earth){
-
-			WorkerBot bot = null;
-			while(true){
 				
+			Bot bot = null;
+			while(true){
+				start = System.currentTimeMillis();
 				System.out.println("Round: " + gc.round());
-				System.out.println("Stats: " + logs.statistics());
+				
 
 				//System.out.println(logs.targets());
 				logs.updateUnits();
+				System.out.println("Stats: " + logs.statistics());
 
 				for(int i = 0; i < units.size(); i++){
 					units = logs.units();
 					Unit u = units.get(i);
 
+					if(u.location().isInGarrison()){
+						continue;
+					}
 					if(u.unitType() == UnitType.Factory){
-						HashMap<Integer, Integer> bps = logs.blueprints();
-						if(u.structureIsBuilt()!=0){//if structure is finished
-      						if(bps.size()>0&&bps.keySet().contains(u.id())){//check the blueprint hashset for this blueprint and remove it
-      							bps.remove(u.id());
-      						}
-      					}
-					}	
+						bot = new FactoryBot(u,gc,logs);
+					}
+					if(u.unitType() == UnitType.Ranger){
+						bot = new RangerBot(u,gc,logs);
+					}
+					if(u.unitType() == UnitType.Knight){
+						bot = new KnightBot(u,gc,logs);
+					}
 					if(u.unitType()==UnitType.Worker){
 						bot = new WorkerBot(u,gc,logs);
-						bot.act();
 					}
+
+					bot.act();
+					
 				}
+				
+				time += (System.currentTimeMillis()-start);
+				System.out.println(gc.round()+" : " +time/1000.0 +"seconds");
 				gc.nextTurn();
+
 			}
 		}
 		else{

@@ -66,7 +66,7 @@ public class BFS{
 			}
 			steps++;
 		}
-		System.out.println("Steps:"+steps);
+		//System.out.println("Steps:"+steps);
 		return paths;
 	}
 

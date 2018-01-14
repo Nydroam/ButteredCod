@@ -33,17 +33,22 @@ public class Logistics{
 	public HashMap<Integer,MapLocation> targets(){return targets;}
 	//Scans map for initial karbonite deposits and records locations
 	public void scoutKarbonite(){
+		long start = System.currentTimeMillis();
 		for(int x = 0; x < pm.getWidth(); x++)
 			for(int y = 0; y < pm.getHeight(); y++){
 				MapLocation loc = new MapLocation(gc.planet(),x,y);
 				if(pm.initialKarboniteAt(loc)>0)
 					karbLocations.add(loc);
 			}
+			System.out.println("Scouting: " + (System.currentTimeMillis()-start)/1000.0 );
 	}
 
 	//Update units and statistics
 	public void updateUnits(){
 		units = gc.myUnits();
+		initStats();
+		for(int i = 0; i < units.size(); i++)
+			updateStats(units.get(i).unitType().toString(),1);
 	}
 
 	//adds the integer to the current unit amount in the statistics hashmap
@@ -54,7 +59,7 @@ public class Logistics{
 		statistics = new HashMap<String, Integer>();
 		statistics.put("Factory",0);
 		statistics.put("Rocket",0);
-		statistics.put("Worker",(int)units.size());
+		statistics.put("Worker",0);
 		statistics.put("Knight",0);
 		statistics.put("Ranger",0);
 		statistics.put("Mage",0);
