@@ -20,6 +20,7 @@ public class BFS{
 
 	//Starting location, unit that wants to move, whether or not to do a full search of the map or only enough to path the unit
 	public HashMap<String,Direction> search(MapLocation start, Unit u, boolean full){
+		System.out.println("BFSING");
 		//we offer the starting location and then fill in all adjacent locations with directions pointing to it
 		//we offer each added location and then poll off the queue and repeat with fillign in adjacent locations
 

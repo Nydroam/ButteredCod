@@ -12,8 +12,8 @@ public class FactoryBot extends Bot{
       			bps.remove(unit.id());
       		}
       		
-
-      		if(Math.random()<1.0){
+      		if(logs.statistics().get("Ranger")>20){}
+      		else if(Math.random()<1.0){
       			produceUnit(UnitType.Ranger);
       		}else
       			produceUnit(UnitType.Knight);

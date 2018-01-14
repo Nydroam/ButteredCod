@@ -13,13 +13,13 @@ public class Player{
 
 		//Variable Initialization
 		Logistics logs = new Logistics(gc,pm);
-		VecUnit units=logs.units();;
+		VecUnit units=logs.units();
 		//Enemy Team
 		
 		
 		gc.queueResearch(UnitType.Ranger);
-		gc.queueResearch(UnitType.Knight);
-		
+		gc.queueResearch(UnitType.Rocket);
+
 		if(gc.planet()==Planet.Earth){
 				
 			Bot bot = null;
@@ -28,7 +28,7 @@ public class Player{
 				System.out.println("Round: " + gc.round());
 				
 
-				//System.out.println(logs.targets());
+				System.out.println(logs.targets());
 				logs.updateUnits();
 				System.out.println("Stats: " + logs.statistics());
 
@@ -51,7 +51,9 @@ public class Player{
 					if(u.unitType()==UnitType.Worker){
 						bot = new WorkerBot(u,gc,logs);
 					}
-
+					if(u.unitType()==UnitType.Rocket){
+						bot = new RocketBot(u,gc,logs);
+					}
 					bot.act();
 					
 				}
@@ -64,6 +66,26 @@ public class Player{
 		}
 		else{
 			while(true){
+				logs.updateUnits();
+				units = logs.units();
+				for(int i = 0; i < units.size(); i++){
+					units = logs.units();
+					Unit u = units.get(i);
+					if(u.location().isInGarrison()){
+						continue;
+					}
+					MapLocation loc = u.location().mapLocation();
+					if(u.unitType()==UnitType.Rocket){
+						
+						System.out.println("WOOT MARS");
+						while(u.structureGarrison().size()>0){
+							Direction d = Fuzzy.findAdjacent(loc,gc);
+							if(gc.canUnload(u.id(),d))
+								gc.unload(u.id(),d);
+							else{break;}
+						}
+					}
+				}
 				gc.nextTurn();
 			}
 		}

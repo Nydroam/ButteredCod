@@ -6,6 +6,7 @@ public class RangerBot extends Bot{
 	}
 
 	public void act(){
+
 		Unit enemy = enemyAtRange(200);
 		if(enemy!=null){//attempt to attack main target, set destination if exists
 			
@@ -31,6 +32,7 @@ public class RangerBot extends Bot{
 		enemy = enemyAtRange(unit.attackRange());
 		if(enemy!=null)
 			tryAttack(enemy.id());		
+
 
 	}
 

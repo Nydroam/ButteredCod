@@ -67,11 +67,12 @@ public class Player {
                 System.out.println("Round: " + round);
                 System.out.println(gc.rocketLandings());
            // }
+                VecUnit units = gc.myUnits();
                 if(gc.planet()==Planet.Earth){
                     System.out.println("Working");
                 // VecUnit is a class that you can think of as similar to ArrayList<Unit>, but immutable.
            
-            VecUnit units = gc.myUnits();
+            
             
 
 
@@ -163,7 +164,7 @@ public class Player {
                                 y = (int)(Math.random()*pm.getHeight());}
                                 System.out.println("ROCKET LAUNCHED!");
                                 System.out.println("Before Launch: "+gc.myUnits().size());
-                                //gc.launchRocket(unit.id(),new MapLocation(Planet.Mars,x,y));
+                                gc.launchRocket(unit.id(),new MapLocation(Planet.Mars,x,y));
                                 System.out.println("After Launch: "+gc.myUnits().size());
                                 launched = true;
                             }
@@ -189,7 +190,7 @@ public class Player {
                         }
                     }
                     else{
-                        /*for (int i = 0; i < units.size(); i++) {
+                        for (int i = 0; i < units.size(); i++) {
                             Direction d = randDirection();
                             Unit unit = units.get(i);
                             if(unit.unitType()==UnitType.Worker){
@@ -208,7 +209,7 @@ public class Player {
                                 if(gc.canUnload(unit.id(),d))
                                     gc.unload(unit.id(),d);
                             }
-                        }*/
+                        }
                     }
 
             // Submit the actions we've done, and wait for our next turn.
