@@ -7,7 +7,7 @@ public class RangerBot extends Bot{
 
 	public void act(){
 
-		Unit enemy = enemyAtRange(200);
+		Unit enemy = enemyAtRange(400);
 		if(enemy!=null){//attempt to attack main target, set destination if exists
 			
 
@@ -23,6 +23,13 @@ public class RangerBot extends Bot{
 
 		else if(dest!=null) //if there is no close enemy, move toward a destination if there is one
 			tryMove();
+
+		else{
+			Direction[] dirs = Direction.values();
+			d = dirs[(int)(Math.random()*dirs.length)];
+			if(gc.isMoveReady(id)&&gc.canMove(id,d))
+				gc.moveRobot(id,d);
+		}
 
 		if(enemy!=null){//attempt to attack main target again
 			tryAttack(enemy.id());

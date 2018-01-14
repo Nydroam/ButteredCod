@@ -77,5 +77,8 @@ public class Logistics{
 		blueprints.remove(i);
 	}
 
+	public void resetTargets(){
+		targets = new HashMap<Integer,MapLocation>();
+	}
 
 }
