@@ -18,12 +18,10 @@ public class Player{
 			
 			//pre-set research
 			gc.queueResearch(UnitType.Rocket);
-			gc.queueResearch(UnitType.Worker);
-			gc.queueResearch(UnitType.Worker);
-			gc.queueResearch(UnitType.Worker);
 			gc.queueResearch(UnitType.Ranger);
 			gc.queueResearch(UnitType.Ranger);
-			gc.queueResearch(UnitType.Rocket);
+			gc.queueResearch(UnitType.Worker);
+			gc.queueResearch(UnitType.Ranger);
 			
 			
 			//bot to be set up later

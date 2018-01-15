@@ -25,10 +25,12 @@ public class RangerBot extends Bot{
 			tryMove();
 
 		else{
+			if(gc.senseNearbyUnits(loc,2).size()>5){
 			Direction[] dirs = Direction.values();
 			d = dirs[(int)(Math.random()*dirs.length)];
 			if(gc.isMoveReady(id)&&gc.canMove(id,d))
 				gc.moveRobot(id,d);
+			}
 		}
 
 		if(enemy!=null){//attempt to attack main target again

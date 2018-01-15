@@ -218,7 +218,7 @@ public class WorkerBot extends Bot{
 		}
 
 		if(dest == null){//blueprint rocket
-			if(gc.researchInfo().getLevel(UnitType.Rocket)>0&&logs.statistics().get("Rocket")<2&&gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Rocket)){
+			if(gc.researchInfo().getLevel(UnitType.Rocket)>0&&logs.statistics().get("Rocket")<1&&gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Rocket)){
 				d = Fuzzy.findAdjacent(loc,gc);
 				if(gc.canBlueprint(id,UnitType.Rocket,d)){
 					gc.blueprint(id,UnitType.Rocket,d);
@@ -247,7 +247,7 @@ public class WorkerBot extends Bot{
 		}
 
 		if(dest==null){//continue trying to assign a task
-			if(logs.karbLocations().size()>10){//when workers should continue working
+			if(gc.round()<100){//when workers should continue working
 			
 				//find the closest deposit in distance
 				Comparator<MapLocation> comp = (loc1,loc2) -> Long.compare(loc1.distanceSquaredTo(loc),loc2.distanceSquaredTo(loc));
