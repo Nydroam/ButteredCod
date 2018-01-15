@@ -30,7 +30,7 @@ public class RocketBot extends Bot{
 				enemyTeam = Team.Blue;
 			VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,80,enemyTeam);
 
-			if(unit.structureGarrison().size()>6||enemies.size()>3||gc.round()==749){
+			if(unit.structureGarrison().size()>4||enemies.size()>3||gc.round()==749){
 				while(!gc.canLaunchRocket(id,new MapLocation(Planet.Mars,x,y))){
 					x = (int)(Math.random()*pm.getWidth());
 					y = (int)(Math.random()*pm.getHeight());

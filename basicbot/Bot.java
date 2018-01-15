@@ -56,7 +56,7 @@ public class Bot{
         	Unit enemy = null;
         	for(int i = 0; i < vec.size(); i++){
         		UnitType ut = vec.get(i).unitType();
-        		if(gc.canAttack(id,vec.get(i).id())){
+        		if(gc.canAttack(id,vec.get(i).id())||loc.distanceSquaredTo(vec.get(i).location().mapLocation())>10){
         			enemy = vec.get(i);
 	        		if(ut==UnitType.Ranger||ut==UnitType.Mage)
 	        			break;

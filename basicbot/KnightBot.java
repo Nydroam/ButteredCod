@@ -30,6 +30,12 @@ public class KnightBot extends Bot{
 		if(enemy!=null)
 			tryAttack(enemy.id());		
 
+if(gc.isMoveReady(id)){
+		Direction[] dirs = Direction.values();
+		d = dirs[(int)(Math.random()*dirs.length)];
+		if(gc.canMove(id,d))
+			gc.moveRobot(id,d);
+		}
 	}
 
 

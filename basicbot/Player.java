@@ -19,8 +19,12 @@ public class Player{
 			//pre-set research
 			gc.queueResearch(UnitType.Rocket);
 			gc.queueResearch(UnitType.Worker);
-			gc.queueResearch(UnitType.Ranger);
 			gc.queueResearch(UnitType.Worker);
+			gc.queueResearch(UnitType.Worker);
+			gc.queueResearch(UnitType.Ranger);
+			gc.queueResearch(UnitType.Ranger);
+			gc.queueResearch(UnitType.Rocket);
+			
 			
 			//bot to be set up later
 			Bot bot = null;
@@ -101,24 +105,24 @@ public class Player{
 						bot.act();
 					}
 					if(u.unitType()==UnitType.Worker){
-
-
 						VecUnit surround = gc.senseNearbyUnits(u.location().mapLocation(),2);
-
-
-						
 						Direction[] dirs = Direction.values();
 						Direction d = dirs[(int)(Math.random()*dirs.length)];
-						if(surround.size()<5){
+						if(gc.round()>740||gc.karbonite()>200){
+						
+						
+						
+						if(surround.size()>8){
 							d = Fuzzy.findAdjacent(u.location().mapLocation(),gc);
 						}
 						if(gc.karbonite()>15&&gc.canReplicate(u.id(),d)){//try replicating then moving
 							gc.replicate(u.id(),d);
-					
+						}
 						//d = Fuzzy.findAdjacent(u.location().mapLocation(),gc);
 							
-						}else{
-							Direction s = d;
+						}
+							if(gc.isMoveReady(u.id())&&gc.canMove(u.id(),d))
+									gc.moveRobot(u.id(),d);
 							for(int j = 0; j < dirs.length; j++){
 								 d = dirs[j];
 								if(gc.canHarvest(u.id(),d)){
@@ -126,18 +130,10 @@ public class Player{
 								}
 							}
 								
-								if(gc.isMoveReady(u.id())&&gc.canMove(u.id(),s))
-									gc.moveRobot(u.id(),s);
-
-								for(int j = 0; j < dirs.length; j++){
-									 d = dirs[j];
-									if(gc.canHarvest(u.id(),d)){
-										gc.harvest(u.id(),d);
-									}
-								}
+								
 							
-						}
 					}
+					
 				}
 
 				
