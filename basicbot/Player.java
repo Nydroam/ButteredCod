@@ -4,11 +4,8 @@ public class Player{
 	public static void main(String[] args){
 
 		//Game Initialization
-		long start = System.currentTimeMillis();
-		long time;
+		
 		GameController gc = new GameController();
-		time = System.currentTimeMillis()-start;
-        System.out.println("After gc: "+time/1000.0 + "s");
 		PlanetMap pm = gc.startingMap(gc.planet());
 
 		//Variable Initialization
@@ -17,21 +14,23 @@ public class Player{
 		//Enemy Team
 		
 		
-		gc.queueResearch(UnitType.Ranger);
-		gc.queueResearch(UnitType.Rocket);
-
 		if(gc.planet()==Planet.Earth){
-				
+			
+			//pre-set research
+			gc.queueResearch(UnitType.Rocket);
+			gc.queueResearch(UnitType.Worker);
+			gc.queueResearch(UnitType.Ranger);
+			gc.queueResearch(UnitType.Worker);
+			
+			//bot to be set up later
 			Bot bot = null;
-			while(true){
-				start = System.currentTimeMillis();
-				System.out.println("Round: " + gc.round());
-				
 
-				System.out.println(logs.targets());
+			while(true){
 				logs.updateUnits();
 				units = logs.units();
+				System.out.println("Round: "+ gc.round());
 				System.out.println("Stats: " + logs.statistics());
+				System.out.println("Time Left: " + gc.getTimeLeftMs()/1000.0 + "seconds");
 				
 				for(int i = 0; i < units.size(); i++){
 					
@@ -42,35 +41,45 @@ public class Player{
 					}
 					if(u.unitType() == UnitType.Factory){
 						bot = new FactoryBot(u,gc,logs);
+						bot.act();
 					}
 					if(u.unitType() == UnitType.Ranger){
 						bot = new RangerBot(u,gc,logs);
+						if(gc.round()<100)
+							bot.act();
+						else
+							bot.act2();
 					}
 					if(u.unitType() == UnitType.Knight){
 						bot = new KnightBot(u,gc,logs);
+						bot.act();
 					}
 					if(u.unitType()==UnitType.Worker){
 						bot = new WorkerBot(u,gc,logs);
+						bot.act();
 					}
 					if(u.unitType()==UnitType.Rocket){
 						bot = new RocketBot(u,gc,logs);
+						bot.act();
 					}
-					bot.act();
+					
 					
 				}
 			
-				
-				time += (System.currentTimeMillis()-start);
-				System.out.println(gc.round()+" : " +time/1000.0 +"seconds");
 				gc.nextTurn();
 
 			}
 		}
 		else{
 			while(true){
-				start = System.currentTimeMillis();
 				logs.updateUnits();
 				units = logs.units();
+
+				System.out.println("Round: "+ gc.round());
+				System.out.println("Stats: " + logs.statistics());
+				System.out.println("Time Left: " + gc.getTimeLeftMs()/1000.0 + "seconds");
+
+				
 				for(int i = 0; i < units.size(); i++){
 					units = logs.units();
 					Unit u = units.get(i);
@@ -80,7 +89,6 @@ public class Player{
 					MapLocation loc = u.location().mapLocation();
 					if(u.unitType()==UnitType.Rocket){
 						
-						//System.out.println("WOOT MARS");
 						while(u.structureGarrison().size()>0){
 							Direction d = Fuzzy.findAdjacent(loc,gc);
 							if(gc.canUnload(u.id(),d))
@@ -94,37 +102,45 @@ public class Player{
 					}
 					if(u.unitType()==UnitType.Worker){
 
+
+						VecUnit surround = gc.senseNearbyUnits(u.location().mapLocation(),2);
+
+
 						
 						Direction[] dirs = Direction.values();
-
 						Direction d = dirs[(int)(Math.random()*dirs.length)];
-						//Direction d = Fuzzy.findAdjacent(u.location().mapLocation(),gc);
+						if(surround.size()<5){
+							d = Fuzzy.findAdjacent(u.location().mapLocation(),gc);
+						}
 						if(gc.karbonite()>15&&gc.canReplicate(u.id(),d)){//try replicating then moving
 							gc.replicate(u.id(),d);
 					
 						//d = Fuzzy.findAdjacent(u.location().mapLocation(),gc);
 							
 						}else{
-
-							d = Direction.Center;
-							if(gc.canHarvest(u.id(),d)){//if you can harvest, don't move
-								gc.harvest(u.id(),d);
-							}else{
-							d = dirs[(int)(Math.random()*dirs.length)];
-								//d = Fuzzy.findAdjacent(u.location().mapLocation(),gc);
-								if(gc.isMoveReady(u.id())&&gc.canMove(u.id(),d))
-									gc.moveRobot(u.id(),d);
-
-								d = Direction.Center;
-								if(gc.canHarvest(u.id(),d))
+							Direction s = d;
+							for(int j = 0; j < dirs.length; j++){
+								 d = dirs[j];
+								if(gc.canHarvest(u.id(),d)){
 									gc.harvest(u.id(),d);
+								}
 							}
+								
+								if(gc.isMoveReady(u.id())&&gc.canMove(u.id(),s))
+									gc.moveRobot(u.id(),s);
+
+								for(int j = 0; j < dirs.length; j++){
+									 d = dirs[j];
+									if(gc.canHarvest(u.id(),d)){
+										gc.harvest(u.id(),d);
+									}
+								}
+							
 						}
 					}
 				}
 
-				time += (System.currentTimeMillis()-start);
-				System.out.println(gc.round()+" : " +time/1000.0 +"seconds");
+				
 				gc.nextTurn();
 			}
 		}

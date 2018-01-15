@@ -15,7 +15,7 @@ public class FactoryBot extends Bot{
 
       		if(logs.statistics().get("Ranger")<=15){
       			produceUnit(UnitType.Ranger);
-      		}else if(logs.statistics().get("Worker")<=10){
+      		}else if(logs.statistics().get("Worker")<=3){
       			produceUnit(UnitType.Worker);
       		}
 

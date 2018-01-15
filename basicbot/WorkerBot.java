@@ -17,7 +17,7 @@ public class WorkerBot extends Bot{
 			dest = targets.get(id);
 		}
 
-		if(logs.statistics().get("Worker") < 15 && gc.round()<20){//Limiting amount of workers
+		if(logs.statistics().get("Worker") < 20 && gc.round()<20){//Limiting amount of workers
 
 			if(tryReplicate())
 				logs.updateStats("Worker",1);
@@ -30,8 +30,12 @@ public class WorkerBot extends Bot{
 			checkTargets();//check again after moving
 			}
 		}else{
-			if(gc.isMoveReady(id))
+			tryHarvest();
+			if(gc.isMoveReady(id)){
+				
 				tryMove();
+				tryHarvest();
+			}
 		}
 	}
 	public boolean tryMove(){
@@ -83,7 +87,7 @@ public class WorkerBot extends Bot{
 							return true;
 						}
 					}
-					else if(building.unitType()==UnitType.Rocket){
+					else if(building.unitType()==UnitType.Rocket&&loc.isAdjacentTo(dest)){
 						return true;
 					}
 					else{
@@ -157,7 +161,7 @@ public class WorkerBot extends Bot{
 		//assign a target to current unit and update targets hashmap
 
 		HashMap<Integer, Integer> bps = logs.blueprints();
-		if(logs.statistics().get("Rocket")>0){
+		if(dest==null&&logs.statistics().get("Rocket")>0){
 			VecUnit vec = gc.senseNearbyUnitsByType(loc,500,UnitType.Rocket);
 			for(int i = 0; i < vec.size(); i++){
 				Unit u = vec.get(i);
