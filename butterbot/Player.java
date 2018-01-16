@@ -46,7 +46,7 @@ public class Player{
 				logs.updateUnits();
 				units = logs.units();
 				System.out.println("Round: "+ gc.round());
-				System.out.println("Stats: " + logs.statistics());
+				//System.out.println("Stats: " + logs.statistics());
 				System.out.println("Time Left: " + gc.getTimeLeftMs()/1000.0 + "seconds");
 				
 				//removing empty visible rally points, leaving the most recent one if there aren't any left
@@ -80,7 +80,7 @@ public class Player{
 					paths = testPath.fullSearch(bc.bcMapLocationFromJson(rallyPoints.peek()));
 					loc1 = bc.bcMapLocationFromJson(rallyPoints.peek());
 					
-					testPath.printMap();
+					//testPath.printMap();
 				}
 				
 
@@ -134,7 +134,7 @@ public class Player{
 				units = logs.units();
 
 				System.out.println("Round: "+ gc.round());
-				System.out.println("Stats: " + logs.statistics());
+				//System.out.println("Stats: " + logs.statistics());
 				System.out.println("Time Left: " + gc.getTimeLeftMs()/1000.0 + "seconds");
 
 
@@ -168,7 +168,7 @@ public class Player{
 
 					BFS testPath = new BFS(gc);
 					paths = testPath.fullSearch(bc.bcMapLocationFromJson(rallyPoints.peek()));
-					testPath.printMap();
+					//testPath.printMap();
 				}
 
 				
