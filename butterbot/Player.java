@@ -25,12 +25,16 @@ public class Player{
 		if(gc.planet()==Planet.Earth){
 			
 			//pre-set research
+			
 			gc.queueResearch(UnitType.Ranger);
 			gc.queueResearch(UnitType.Healer);
+
 			gc.queueResearch(UnitType.Rocket);
 			gc.queueResearch(UnitType.Worker);
 			gc.queueResearch(UnitType.Ranger);
 			gc.queueResearch(UnitType.Healer);
+			gc.queueResearch(UnitType.Worker);
+			gc.queueResearch(UnitType.Worker);
 			gc.queueResearch(UnitType.Ranger);
 			
 
@@ -70,7 +74,7 @@ public class Player{
 					}
 				}
 
-				if(rallyPoints.size()>0&&gc.round()%5==0&&logs.statistics().get("Ranger")>0){
+				if(rallyPoints.size()>0&&gc.round()%10==0&&logs.statistics().get("Ranger")>0){
 
 					BFS testPath = new BFS(gc);
 					paths = testPath.fullSearch(bc.bcMapLocationFromJson(rallyPoints.peek()));
@@ -186,6 +190,7 @@ public class Player{
 					}
 					if(u.unitType()==UnitType.Ranger){
 						RangerBot bot = new RangerBot(u,gc,logs,paths);
+
 						bot.act();
 					}
 					if(u.unitType()==UnitType.Healer){
@@ -199,9 +204,13 @@ public class Player{
 						if(gc.round()>749||gc.karbonite()>200){
 						
 						
-						if(gc.karbonite()>15){
-							if(surround.size()>8){
-								d = Fuzzy.findAdjacent(u.location().mapLocation(),gc);
+						if(gc.karbonite()>15&&logs.statistics().get("Ranger")>logs.statistics().get("Worker")*3){
+							for(int j = 0; j < dirs.length; j++){
+								if(gc.canReplicate(u.id(),dirs[j])){
+									d = dirs[j];
+									if(Math.random()<0.15)
+										break;
+								}
 							}
 							if(gc.canReplicate(u.id(),d)){//try replicating then moving
 								gc.replicate(u.id(),d);
@@ -210,13 +219,17 @@ public class Player{
 						//d = Fuzzy.findAdjacent(u.location().mapLocation(),gc);
 							
 						}
+						if(gc.karbonite()<300){
 							if(gc.isMoveReady(u.id())&&gc.canMove(u.id(),d))
 									gc.moveRobot(u.id(),d);
+							
+							
 							for(int j = 0; j < dirs.length; j++){
 								 d = dirs[j];
 								if(gc.canHarvest(u.id(),d)){
 									gc.harvest(u.id(),d);
 								}
+							}
 							}
 								
 								

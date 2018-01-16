@@ -65,10 +65,19 @@ public class RangerBot extends Bot{
 				
 		}
 
-		if(gc.isMoveReady(id)&&(gc.senseNearbyUnitsByTeam(loc,2500,enemyTeam).size()==0||gc.planet()==Planet.Mars)) {
+		if(gc.isMoveReady(id) ){
+			if(gc.planet()==Planet.Mars){
+				if (gc.senseNearbyUnitsByTeam(loc,2500,enemyTeam).size()>0){
+					Direction d = Fuzzy.findAdjacent(loc,gc);
+			if(gc.canMove(id,d))
+				gc.moveRobot(id,d);
+			}
+				
+			}else if (gc.senseNearbyUnitsByTeam(loc,2500,enemyTeam).size()==0){
 			Direction d = Fuzzy.findAdjacent(loc,gc);
 			if(gc.canMove(id,d))
 				gc.moveRobot(id,d);
+			}
 		}
 	}
 
@@ -100,7 +109,8 @@ public class RangerBot extends Bot{
 				Unit enemy = enemyAtRange(unit.attackRange());
 				if(enemy!=null)
 					tryAttack(enemy.id());
-				tryMove();
+				if(!loc.isAdjacentTo(dest))
+					tryMove();
 				enemy = enemyAtRange(unit.attackRange());
 				if(enemy!=null)
 					tryAttack(enemy.id());
