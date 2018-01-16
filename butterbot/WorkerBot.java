@@ -203,27 +203,28 @@ public class WorkerBot extends Bot{
 					enemyTeam = Team.Blue;
 				VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,80,enemyTeam);
 				VecUnit allies = gc.senseNearbyUnitsByTeam(loc,25,gc.team());
-				if(allies.size()>3) {
+				if(allies.size()>2) {
+	    		
 	    		d = Fuzzy.findAdjacent(loc,gc);
-	    	
-	    		if(gc.canBlueprint(id,UnitType.Factory,d)){
-	    			gc.blueprint(id,UnitType.Factory,d);
-	    			targets.put(id,loc.add(d));
-	    			logs.updateStats("Factory",1);
-	    			//bps.put(gc.senseNearbyUnitsByType(loc.add(d),1,UnitType.Factory).get(0).id(),1);
-	    			bps.put(gc.senseUnitAtLocation(loc.add(d)).id(),1);
-	    			dest = targets.get(id);
-	    		}
+	    		
+		    		if(gc.canBlueprint(id,UnitType.Factory,d)&&Fuzzy.numAdjacent(loc.add(d),gc)>0){
+		    			gc.blueprint(id,UnitType.Factory,d);
+		    			targets.put(id,loc.add(d));
+		    			logs.updateStats("Factory",1);
+		    			//bps.put(gc.senseNearbyUnitsByType(loc.add(d),1,UnitType.Factory).get(0).id(),1);
+		    			bps.put(gc.senseUnitAtLocation(loc.add(d)).id(),1);
+		    			dest = targets.get(id);
+		    		}
 				}
 	    	}
 		}
 
 		if(dest == null){//blueprint rocket
-			if(gc.researchInfo().getLevel(UnitType.Rocket)>0&&logs.statistics().get("Rocket")<1&&gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Rocket)){
+			if(gc.researchInfo().getLevel(UnitType.Rocket)>0&&logs.statistics().get("Rocket")<2&&gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Rocket)){
 				VecUnit allies = gc.senseNearbyUnitsByTeam(loc,25,gc.team());
 				if(allies.size()>4){
 				d = Fuzzy.findAdjacent(loc,gc);
-				if(gc.canBlueprint(id,UnitType.Rocket,d)){
+				if(gc.canBlueprint(id,UnitType.Rocket,d)&&Fuzzy.numAdjacent(loc.add(d),gc)>2){
 					gc.blueprint(id,UnitType.Rocket,d);
 					targets.put(id,loc.add(d));
 					logs.updateStats("Rocket",1);

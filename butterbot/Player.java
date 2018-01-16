@@ -204,7 +204,7 @@ public class Player{
 						if(gc.round()>749||gc.karbonite()>200){
 						
 						
-						if(gc.karbonite()>15&&logs.statistics().get("Ranger")>logs.statistics().get("Worker")*3){
+						if(gc.karbonite()>15){//&&logs.statistics().get("Ranger")>logs.statistics().get("Worker")*3){
 							for(int j = 0; j < dirs.length; j++){
 								if(gc.canReplicate(u.id(),dirs[j])){
 									d = dirs[j];
