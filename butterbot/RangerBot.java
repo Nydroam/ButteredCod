@@ -67,7 +67,7 @@ public class RangerBot extends Bot{
 
 		if(gc.isMoveReady(id) ){
 			if(gc.planet()==Planet.Mars){
-				if (gc.senseNearbyUnitsByTeam(loc,2500,enemyTeam).size()>0){
+				if (gc.senseNearbyUnitsByTeam(loc,2500,enemyTeam).size()>0||gc.round()<700){
 					Direction d = Fuzzy.findAdjacent(loc,gc);
 			if(gc.canMove(id,d))
 				gc.moveRobot(id,d);
