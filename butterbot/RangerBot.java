@@ -31,8 +31,8 @@ public class RangerBot extends Bot{
 		
 		Unit enemy = enemyAtRange(unit.attackRange());
 		if(enemy!=null){
-			if(tryAttack(enemy.id()))
-				return;
+			if(tryAttack(enemy.id())){}
+				
 		}
 
 		Team enemyTeam = Team.Red;
@@ -44,19 +44,28 @@ public class RangerBot extends Bot{
 		for(int i = 0; i < enem.size(); i++)
 			if(enem.get(i).unitType()==UnitType.Ranger)
 				enemies.add(enem.get(i));
-		VecUnit allies = gc.senseNearbyUnitsByTeam(loc,100,gc.team());
-		if(enemies.size()<allies.size()*2)
+		VecUnit all = gc.senseNearbyUnitsByTeam(loc,25,gc.team());
+		ArrayList<Unit> allies = new ArrayList<Unit>();
+		for(int i = 0; i < all.size(); i++)
+			if(all.get(i).unitType()==UnitType.Ranger)
+				allies.add(all.get(i));
+
+		VecUnit close = gc.senseNearbyUnitsByTeam(loc,2,enemyTeam);
+		if(close.size()>0){
+			testMove(true);
+		}
+		else if(enemies.size()<allies.size())
 			testMove(false);
 		else if(unit.health()<unit.maxHealth())
-			//testMove(true);
+			testMove(true);
 		enemy = enemyAtRange(unit.attackRange());
 		if(enemy!=null){
 
-			if(tryAttack(enemy.id()))
-				return;
+			if(tryAttack(enemy.id())){}
+				
 		}
 
-		if(gc.isMoveReady(id)&&gc.senseNearbyUnitsByTeam(loc,2500,enemyTeam).size()==0){
+		if(gc.isMoveReady(id)&&(gc.senseNearbyUnitsByTeam(loc,2500,enemyTeam).size()==0||gc.planet()==Planet.Mars)) {
 			Direction d = Fuzzy.findAdjacent(loc,gc);
 			if(gc.canMove(id,d))
 				gc.moveRobot(id,d);

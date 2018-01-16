@@ -56,7 +56,7 @@ public class RangerBot extends Bot{
 			VecUnit vec = gc.senseNearbyUnitsByType(loc,500,UnitType.Rocket);
 			for(int i = 0; i < vec.size(); i++){
 				Unit u = vec.get(i);
-				if(u.team()==gc.team()){//on our team
+				if(u.team()==gc.team()&&loc.distanceSquaredTo(vec.get(i).location().mapLocation())<25){//on our team
 					targets.put(id,u.location().mapLocation());
 					dest = targets.get(id);
 					break;

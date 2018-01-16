@@ -58,18 +58,39 @@ public class Bot{
 		if(gc.team()==Team.Red)
             enemyTeam = Team.Blue;
         VecUnit vec = gc.senseNearbyUnitsByTeam(loc,radius,enemyTeam);
+
         if(vec.size()>0){
 
         	Unit enemy = null;
+        	Unit chosen = null;
+        	int priority = 0;
+        	long hp = 500;
         	for(int i = 0; i < vec.size(); i++){
         		UnitType ut = vec.get(i).unitType();
+
         		if(gc.canAttack(id,vec.get(i).id())){//||loc.distanceSquaredTo(vec.get(i).location().mapLocation())>10){
         			enemy = vec.get(i);
-	        		if(ut==UnitType.Ranger||ut==UnitType.Mage)
-	        			break;
+	        		if(ut==UnitType.Ranger||ut==UnitType.Mage){
+	        			if(priority<3){
+	        				chosen = enemy;
+	        				priority = 3;
+	        				hp = enemy.health();
+	        			}else if(enemy.health()<hp){
+	        				hp = enemy.health();
+	        				chosen = enemy;
+	        			}
+	        		}else{
+	        			if(priority <1){
+	        				if(enemy.health()<hp){
+	        					chosen = enemy;
+	        					hp = enemy.health();
+	        				}
+	        			}
+	        		}
+
         		}
         	}
-        	return enemy;
+        	return chosen;
         }
         return null;
 	}

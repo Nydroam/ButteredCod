@@ -19,7 +19,7 @@ public class Fuzzy{
 		for(int i = 0; i < directions.length; i++)
 			if(directions[i]!=Direction.Center){
 				MapLocation newl = l.add(directions[i]);
-				if(pm.onMap(newl)&&gc.isOccupiable(newl)!=0){
+				if(pm.onMap(newl)&&gc.canSenseLocation(newl)&&gc.isOccupiable(newl)!=0){
 					d=directions[i];
 					if(Math.random()<0.2)
 						return d;

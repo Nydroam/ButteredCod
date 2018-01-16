@@ -202,7 +202,7 @@ public class WorkerBot extends Bot{
 					enemyTeam = Team.Blue;
 				VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,80,enemyTeam);
 				VecUnit allies = gc.senseNearbyUnitsByTeam(loc,25,gc.team());
-				if(enemies.size()<4&&allies.size()>4) {
+				if(allies.size()>3) {
 	    		d = Fuzzy.findAdjacent(loc,gc);
 	    	
 	    		if(gc.canBlueprint(id,UnitType.Factory,d)){

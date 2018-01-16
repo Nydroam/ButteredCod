@@ -25,13 +25,12 @@ public class Player{
 		if(gc.planet()==Planet.Earth){
 			
 			//pre-set research
-			gc.queueResearch(UnitType.Worker);
+			gc.queueResearch(UnitType.Ranger);
 			gc.queueResearch(UnitType.Healer);
 			gc.queueResearch(UnitType.Rocket);
+			gc.queueResearch(UnitType.Worker);
+			gc.queueResearch(UnitType.Ranger);
 			gc.queueResearch(UnitType.Healer);
-			gc.queueResearch(UnitType.Ranger);
-			gc.queueResearch(UnitType.Ranger);
-			
 			gc.queueResearch(UnitType.Ranger);
 			
 
@@ -161,7 +160,7 @@ public class Player{
 				}
 
 				
-				if(rallyPoints.size()>0&&gc.round()%5==0&&logs.statistics().get("Ranger")>0){
+				if(rallyPoints.size()>0&&gc.round()%10==0&&logs.statistics().get("Ranger")>0){
 
 					BFS testPath = new BFS(gc);
 					paths = testPath.fullSearch(bc.bcMapLocationFromJson(rallyPoints.peek()));
