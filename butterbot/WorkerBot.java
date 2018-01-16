@@ -17,7 +17,7 @@ public class WorkerBot extends Bot{
 			dest = targets.get(id);
 		}
 
-		if(logs.statistics().get("Worker") < 20 && gc.round()<20){//Limiting amount of workers
+		if(logs.statistics().get("Worker") < 15 && gc.round()<15){//Limiting amount of workers
 
 			if(tryReplicate())
 				logs.updateStats("Worker",1);
@@ -195,15 +195,15 @@ public class WorkerBot extends Bot{
 	    }
 
 	    if(dest==null){//blueprint factory
-	    	if(logs.statistics().get("Factory")<gc.karbonite()/200+3&&gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Factory)){
+	    	if(logs.statistics().get("Factory")<gc.karbonite()/100+2&&gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Factory)){
 	    		//build up to 2 factories when available
 
 	    		Team enemyTeam = Team.Red;
 				if(gc.team()==Team.Red)
 					enemyTeam = Team.Blue;
-				VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,80,enemyTeam);
+				VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,70,enemyTeam);
 				VecUnit allies = gc.senseNearbyUnitsByTeam(loc,25,gc.team());
-				if(allies.size()>2) {
+				if(enemies.size()<3&&allies.size()>3) {
 	    		
 	    		d = Fuzzy.findAdjacent(loc,gc);
 	    		

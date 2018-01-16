@@ -1,7 +1,7 @@
 import bc.*;
 import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.PriorityQueue;
+import java.util.LinkedList;
 public class Bot{
 	
 	protected GameController gc;
@@ -12,7 +12,7 @@ public class Bot{
 	protected MapLocation dest;
 	protected HashMap<Integer,MapLocation> targets;
 	protected HashMap<Integer,Integer> rockets;
-	protected PriorityQueue<String> rallyPoints;
+	protected LinkedList<String> rallyPoints;
 	protected Direction d;
 
 	public Bot(Unit u, GameController gc, Logistics logs){

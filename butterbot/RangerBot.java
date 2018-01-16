@@ -50,12 +50,13 @@ public class RangerBot extends Bot{
 			if(all.get(i).unitType()==UnitType.Ranger)
 				allies.add(all.get(i));
 
-		VecUnit close = gc.senseNearbyUnitsByTeam(loc,2,enemyTeam);
+		VecUnit close = gc.senseNearbyUnitsByTeam(loc,3,enemyTeam);
 		if(close.size()>0){
 			testMove(true);
 		}
 		else if(enemies.size()<allies.size())
 			testMove(false);
+		else if(gc.senseNearbyUnitsByType(loc,9,UnitType.Factory).size()>0){}
 		else if(unit.health()<unit.maxHealth())
 			testMove(true);
 		enemy = enemyAtRange(unit.attackRange());

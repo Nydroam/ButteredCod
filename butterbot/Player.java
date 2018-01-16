@@ -1,6 +1,6 @@
 import bc.*;
 import java.util.HashMap;
-import java.util.PriorityQueue;
+import java.util.LinkedList;
 public class Player{
 	public static void main(String[] args){
 
@@ -18,7 +18,7 @@ public class Player{
 		if(gc.team()==Team.Red)
             enemyTeam = Team.Blue;
 		
-        PriorityQueue<String> rallyPoints = logs.rallyPoints();
+        LinkedList<String> rallyPoints = logs.rallyPoints();
 		HashMap<String,Direction> paths = null;
 		MapLocation loc1 = null;
 
@@ -26,11 +26,12 @@ public class Player{
 			
 			//pre-set research
 			
-			gc.queueResearch(UnitType.Ranger);
+			gc.queueResearch(UnitType.Worker);
 			gc.queueResearch(UnitType.Healer);
 
 			gc.queueResearch(UnitType.Rocket);
-			gc.queueResearch(UnitType.Worker);
+			gc.queueResearch(UnitType.Ranger);
+			
 			gc.queueResearch(UnitType.Ranger);
 			gc.queueResearch(UnitType.Healer);
 			gc.queueResearch(UnitType.Worker);
@@ -73,7 +74,9 @@ public class Player{
 							rallyPoints.offer(eloc.toJson());
 					}
 				}
-
+				if(rallyPoints.size()>0&&gc.round()%100==0){
+					rallyPoints.offer(rallyPoints.poll());
+				}
 				if(rallyPoints.size()>0&&gc.round()%10==0&&logs.statistics().get("Ranger")>0){
 
 					BFS testPath = new BFS(gc);

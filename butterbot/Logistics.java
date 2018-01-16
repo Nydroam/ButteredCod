@@ -1,6 +1,6 @@
 import bc.*;
 import java.util.ArrayList;
-import java.util.PriorityQueue;
+import java.util.LinkedList;
 import java.util.HashMap;
 
 public class Logistics{
@@ -13,7 +13,7 @@ public class Logistics{
 	private HashMap<Integer,MapLocation> targets;
 	private HashMap<Integer, Integer> rockets;
 
-	private PriorityQueue<String> rallyPoints;
+	private LinkedList<String> rallyPoints;
 	private HashMap<ArrayList<MapLocation>, Integer> MarsInfo;
 
 	public Logistics(GameController gc, PlanetMap pm){
@@ -24,7 +24,7 @@ public class Logistics{
 		blueprints = new HashMap<Integer, Integer>();
 		targets = new HashMap<Integer,MapLocation>();
 		rockets = new HashMap<Integer, Integer>();
-		rallyPoints = new PriorityQueue<String>();
+		rallyPoints = new LinkedList<String>();
 		initStats();
 		scoutKarbonite();
 	}
@@ -36,7 +36,7 @@ public class Logistics{
 	public HashMap<Integer, Integer> blueprints(){return blueprints;}
 	public HashMap<Integer,MapLocation> targets(){return targets;}
 	public HashMap<Integer, Integer> rockets(){return rockets;}
-	public PriorityQueue<String> rallyPoints(){return rallyPoints;}
+	public LinkedList<String> rallyPoints(){return rallyPoints;}
 	//Scans map for initial karbonite deposits and records locations
 	public void scoutKarbonite(){
 		long start = System.currentTimeMillis();
