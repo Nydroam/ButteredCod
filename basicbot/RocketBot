@@ -1,6 +1,0 @@
-import bc.*;
-import java.util.HashMap;
-public class FactoryBot extends Bot{
-	public FactoryBot(Unit u, GameController gc, Logistics logs){
-		super(u,gc, logs);
-	}
