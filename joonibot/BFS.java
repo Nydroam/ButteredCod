@@ -126,30 +126,32 @@ public class BFS {
 		return paths;
 	}
 
-	public void printMap(){//used for printing out a representation of the map
-		for(int i = charmap.length-1; i >=0;i--){
-			for(int j = 0; j < charmap[i].length; j++){
-				if(charmap[j][i]!=null){
+	/**
+	 * Prints a representation of the map with arrows on each tile indicating direction.
+	 */
+	public void printMap(){
+		for (int i = charmap.length-1; i >= 0; i--){
+			for (int j = 0; j < charmap[i].length; j++){
+				if (charmap[j][i] != null){
 					String s = charmap[j][i];
 					String v = "";
-
-					if(s.equals("North"))
+					if (s.equals("North"))
 						v = "^";
-					if(s.equals("Northeast"))
+					if (s.equals("Northeast"))
 						v = "/";
-					if(s.equals("Northwest"))
+					if (s.equals("Northwest"))
 						v = "\\";
-					if(s.equals("South"))
+					if (s.equals("South"))
 						v = "v";
-					if(s.equals("Southeast"))
+					if (s.equals("Southeast"))
 						v = "L";
-					if(s.equals("Southwest"))
+					if (s.equals("Southwest"))
 						v = "Z";
-					if(s.equals("East"))
+					if (s.equals("East"))
 						v = ">";
-					if(s.equals("West"))
+					if (s.equals("West"))
 						v = "<";
-					if(s.equals("Center"))
+					if (s.equals("Center"))
 						v = "O";
 					System.out.print(v);
 				}
