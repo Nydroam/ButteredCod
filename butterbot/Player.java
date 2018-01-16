@@ -20,14 +20,18 @@ public class Player{
 		
         PriorityQueue<String> rallyPoints = logs.rallyPoints();
 		HashMap<String,Direction> paths = null;
+		MapLocation loc1 = null;
 
 		if(gc.planet()==Planet.Earth){
 			
 			//pre-set research
-			gc.queueResearch(UnitType.Rocket);
-			gc.queueResearch(UnitType.Ranger);
-			gc.queueResearch(UnitType.Ranger);
 			gc.queueResearch(UnitType.Worker);
+			gc.queueResearch(UnitType.Healer);
+			gc.queueResearch(UnitType.Rocket);
+			gc.queueResearch(UnitType.Healer);
+			gc.queueResearch(UnitType.Ranger);
+			gc.queueResearch(UnitType.Ranger);
+			
 			gc.queueResearch(UnitType.Ranger);
 			
 
@@ -67,13 +71,15 @@ public class Player{
 					}
 				}
 
-				
 				if(rallyPoints.size()>0&&gc.round()%5==0&&logs.statistics().get("Ranger")>0){
 
 					BFS testPath = new BFS(gc);
 					paths = testPath.fullSearch(bc.bcMapLocationFromJson(rallyPoints.peek()));
+					loc1 = bc.bcMapLocationFromJson(rallyPoints.peek());
+					
 					testPath.printMap();
 				}
+				
 
 				for(int i = 0; i < units.size(); i++){
 					
@@ -82,12 +88,14 @@ public class Player{
 					if(u.location().isInGarrison()){
 						continue;
 					}
+					MapLocation loc = u.location().mapLocation();
 					if(u.unitType() == UnitType.Factory){
 						bot = new FactoryBot(u,gc,logs);
 						bot.act();
 					}
 					if(u.unitType() == UnitType.Ranger){
-						bot = new RangerBot(u,gc,logs,paths);
+					
+							bot = new RangerBot(u,gc,logs,paths);
 						if(gc.round()<100)
 							bot.act();
 						else
@@ -99,6 +107,10 @@ public class Player{
 					}
 					if(u.unitType()==UnitType.Worker){
 						bot = new WorkerBot(u,gc,logs);
+						bot.act();
+					}
+					if(u.unitType()==UnitType.Healer){
+						bot = new HealerBot(u,gc,logs);
 						bot.act();
 					}
 					if(u.unitType()==UnitType.Rocket){
@@ -175,6 +187,10 @@ public class Player{
 					}
 					if(u.unitType()==UnitType.Ranger){
 						RangerBot bot = new RangerBot(u,gc,logs,paths);
+						bot.act();
+					}
+					if(u.unitType()==UnitType.Healer){
+						HealerBot bot = new HealerBot(u,gc,logs);
 						bot.act();
 					}
 					if(u.unitType()==UnitType.Worker){

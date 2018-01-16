@@ -13,9 +13,13 @@ public class FactoryBot extends Bot{
       		}
       		
 
+      		
       		if(logs.statistics().get("Ranger")<=15){
       			produceUnit(UnitType.Ranger);
-      		}else if(logs.statistics().get("Worker")<=5){
+      		}else if(logs.statistics().get("Healer")<=3){
+      			produceUnit(UnitType.Healer);
+      		}
+      		else if(logs.statistics().get("Worker")<=5){
       			produceUnit(UnitType.Worker);
       		}else if(gc.karbonite()>300){
       			produceUnit(UnitType.Ranger);

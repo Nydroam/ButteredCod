@@ -133,7 +133,7 @@ public class WorkerBot extends Bot{
 			Direction newd = null;
 			for(int i = 0; i < Fuzzy.rotateOrder.length; i++){
 				newd = Fuzzy.tryRotate(d,Fuzzy.rotateOrder[i]);
-				if(gc.canReplicate(id,newd)&&Math.random()<0.2){
+				if(gc.canReplicate(id,newd)){
 					gc.replicate(id,newd);
 					return true;
 				}
@@ -195,7 +195,7 @@ public class WorkerBot extends Bot{
 	    }
 
 	    if(dest==null){//blueprint factory
-	    	if(logs.statistics().get("Factory")<gc.karbonite()/200+2&&gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Factory)){
+	    	if(logs.statistics().get("Factory")<gc.karbonite()/300+4&&gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Factory)){
 	    		//build up to 2 factories when available
 
 	    		Team enemyTeam = Team.Red;
@@ -203,7 +203,7 @@ public class WorkerBot extends Bot{
 					enemyTeam = Team.Blue;
 				VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,60,enemyTeam);
 				VecUnit allies = gc.senseNearbyUnitsByTeam(loc,25,gc.team());
-				if(enemies.size()<5&&allies.size()>4) {
+				if(enemies.size()<6&&allies.size()>2) {
 	    		d = Fuzzy.findAdjacent(loc,gc);
 	    	
 	    		if(gc.canBlueprint(id,UnitType.Factory,d)){

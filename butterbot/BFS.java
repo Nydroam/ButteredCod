@@ -26,7 +26,7 @@ public class BFS{
 
 		charmap = new String[(int)pm.getWidth()][(int)pm.getHeight()];
 		locations.offer(start);
-		Direction[] directions = Direction.values();
+		Direction[] directions = {Direction.Northeast,Direction.Southwest,Direction.Northwest,Direction.Southeast,Direction.North,Direction.South,Direction.East,Direction.West};
 		int steps = 0;
 		while(!locations.isEmpty()){
 			MapLocation current = locations.poll();
