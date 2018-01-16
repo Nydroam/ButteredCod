@@ -2,6 +2,7 @@ import bc.*;
 import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.ArrayList;
+
 public class BFS{
 
 	public static final int NORTH = 0;
