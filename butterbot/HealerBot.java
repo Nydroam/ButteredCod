@@ -14,7 +14,7 @@ public class HealerBot extends Bot{
         	Unit enemy = null;
         	for(int i = 0; i < vec.size(); i++){
         		Unit u = vec.get(i);
-        		if(u.health()<u.maxHealth()){//||loc.distanceSquaredTo(vec.get(i).location().mapLocation())>10){
+        		if(u.unitType()!=UnitType.Factory&&u.health()<u.maxHealth()){//||loc.distanceSquaredTo(vec.get(i).location().mapLocation())>10){
         			enemy = vec.get(i);
 	        		if(u.unitType()==UnitType.Ranger||u.unitType()==UnitType.Healer)
 	        			break;
