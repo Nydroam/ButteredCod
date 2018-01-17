@@ -33,7 +33,6 @@ public class KnightBot extends Bot {
 			tryAttack(enemy.id());
 			dest = enemy.location().mapLocation();
 		}
-
 		enemy = unitAtRange(unit.attackRange(),logs.getOtherTeam());
 		if (enemy != null)
 			tryAttack(enemy.id());

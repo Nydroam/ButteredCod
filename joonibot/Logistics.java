@@ -6,6 +6,9 @@ import bc.*;
 // Java Imports
 import java.util.ArrayList;
 import java.util.PriorityQueue;
+
+import javax.lang.model.util.ElementScanner6;
+
 import java.util.HashMap;
 
 /*---------------------- CLASS DEF ----------------------*/
@@ -70,8 +73,12 @@ public class Logistics {
 	 */
 	private void setupPriorities(){
 		for (UnitType unitType : UnitType.values()){
-			if (unitType == UnitType.Ranger || unitType == UnitType.Mage)
+			if (unitType == unitType.Healer || unitType == unitType.Factory)
+				unitPriorities.put(unitType,4);
+			else if (unitType == UnitType.Ranger || unitType == UnitType.Mage)
 				unitPriorities.put(unitType,3);
+			else if (unitType == UnitType.Knight)
+				unitPriorities.put(unitType,2);
 			else
 				unitPriorities.put(unitType,1);
 		}

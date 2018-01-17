@@ -92,9 +92,7 @@ public class Bot {
 	 * @return the unit with the highest priority
 	 */
 	public Unit unitAtRange(long radius, Team whichTeam){
-
         VecUnit vec = gc.senseNearbyUnitsByTeam(loc,radius,whichTeam);
-
         if (vec.size() > 0){
         	Unit found = null;
 			Unit chosen = null;
