@@ -70,7 +70,17 @@ public class Bot{
 
         		if(gc.canAttack(id,vec.get(i).id())){//||loc.distanceSquaredTo(vec.get(i).location().mapLocation())>10){
         			enemy = vec.get(i);
-	        		if(ut==UnitType.Ranger||ut==UnitType.Mage){
+        			if(ut==UnitType.Mage||ut==UnitType.Healer){
+        				if(priority<4){
+	        				chosen = enemy;
+	        				priority = 4;
+	        				hp = enemy.health();
+	        			}else if(enemy.health()<hp){
+	        				hp = enemy.health();
+	        				chosen = enemy;
+	        			}
+        			}
+	        		else if(ut==UnitType.Ranger){
 	        			if(priority<3){
 	        				chosen = enemy;
 	        				priority = 3;

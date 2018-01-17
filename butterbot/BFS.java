@@ -48,7 +48,7 @@ public class BFS{
 			}
 			steps++;
 		}
-		//System.out.println("BFS FULL TIME: "+(System.currentTimeMillis()-st));
+		System.out.println("BFS FULL TIME: "+(System.currentTimeMillis()-st));
 		return paths;
 	}
 

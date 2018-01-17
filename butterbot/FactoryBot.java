@@ -1,5 +1,6 @@
 import bc.*;
 import java.util.HashMap;
+import java.util.ArrayList;
 public class FactoryBot extends Bot{
 	public FactoryBot(Unit u, GameController gc, Logistics logs){
 		super(u,gc, logs);
@@ -12,18 +13,37 @@ public class FactoryBot extends Bot{
       			bps.remove(unit.id());
       		}
       		
+      		Team enemyTeam = Team.Red;
+			if(gc.team()==Team.Red)
+				enemyTeam = Team.Blue;
+      		VecUnit c = gc.senseNearbyUnitsByTeam(loc,16,enemyTeam);
+      		ArrayList<Unit> enemyFactories = new ArrayList<Unit>();
+      		for(int i = 0; i < c.size(); i++){
+      			if(c.get(i).unitType()==UnitType.Factory)
+      				enemyFactories.add(c.get(i));
+      		}
 
-      		
-      		if(logs.statistics().get("Ranger")<=15){
-      			produceUnit(UnitType.Ranger);
-      		}else if(logs.statistics().get("Healer")<=2){
-      			produceUnit(UnitType.Healer);
-      		}
-      		else if(logs.statistics().get("Worker")<=5){
-      			produceUnit(UnitType.Worker);
-      		}else if(gc.karbonite()>300){
-      			produceUnit(UnitType.Ranger);
-      		}
+      		if(enemyFactories.size()>0){
+      			produceUnit(UnitType.Knight);
+      		}else{
+      			VecUnit far = gc.senseNearbyUnitsByTeam(loc,400,enemyTeam);
+      			if(far.size()>10){
+		      		if(logs.statistics().get("Ranger")<logs.statistics().get("Healer")*5){
+		      			produceUnit(UnitType.Ranger);
+		      		}else{
+		      			produceUnit(UnitType.Healer);
+		      		}
+	      		}
+	      		else if(logs.statistics().get("Worker")<=5){
+	      			produceUnit(UnitType.Worker);
+	      		}else if(gc.karbonite()>250){
+	      			if(logs.statistics().get("Ranger")<logs.statistics().get("Healer")*5){
+		      			produceUnit(UnitType.Ranger);
+		      		}else{
+		      			produceUnit(UnitType.Healer);
+		      		}
+	      		}
+	      	}
 
       		
       		/*

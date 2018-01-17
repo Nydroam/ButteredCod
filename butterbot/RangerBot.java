@@ -51,7 +51,7 @@ public class RangerBot extends Bot{
 				allies.add(all.get(i));
 
 		VecUnit close = gc.senseNearbyUnitsByTeam(loc,3,enemyTeam);
-		if(close.size()>0){
+		if(close.size()>0||unit.attackHeat()>=10){
 			testMove(true);
 		}
 		else if(enemies.size()<allies.size())

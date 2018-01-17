@@ -88,9 +88,13 @@ public class Player{
 				
 
 				for(int i = 0; i < units.size(); i++){
-					
-					Unit u = units.get(i);
-
+					logs.updateUnits();
+					units = logs.units();
+					Unit u = null;
+					if(i < units.size())
+						u = units.get(i);
+					else
+						break;
 					if(u.location().isInGarrison()){
 						continue;
 					}
