@@ -38,20 +38,20 @@ public class WorkerBot extends Bot {
 
 		// Replicate in the beginning, limiting to 20
 		if (logs.statistics().get("Worker") < 20 && gc.round() < 20){
-			if(tryReplicate())
+			if (tryReplicate())
 				logs.updateStats("Worker",1);
 		}
 
 		// If there is a destination, see if anything can be done/move/check again
-		if(dest!=null){
-			if(!checkTargets()){
+		if (dest!=null){
+			if (!checkTargets()){
 				tryMove();
 				checkTargets();
 			}
 		}
 		else{
 			tryHarvest();
-			if(gc.isMoveReady(id)){
+			if (gc.isMoveReady(id)){
 				tryMove();
 				tryHarvest();
 			}
@@ -65,14 +65,14 @@ public class WorkerBot extends Bot {
 	public boolean tryMove(){
 		if (!super.tryMove()){
 			// Pathing variables
-			if(gc.isMoveReady(id) && dest != null && gc.round() < 50){
+			if (gc.isMoveReady(id) && dest != null && gc.round() < 50){
 				System.out.println("BFSING");
 				BFS rally = new BFS(gc);
 				HashMap<String,Direction> paths;
 				paths = rally.search(dest,unit,false);
-				d = paths.get(loc.toString());
-				if(paths.keySet().contains(loc.toString()) && gc.canMove(id,d)){
-					gc.moveRobot(id,d);
+				dir = paths.get(loc.toString());
+				if (paths.keySet().contains(loc.toString()) && gc.canMove(id,dir)){
+					gc.moveRobot(id,dir);
 					return true;
 				}else{
 					//targets.remove(id);
@@ -81,9 +81,9 @@ public class WorkerBot extends Bot {
 			else{
 				//rando movment
 				Direction[] dirs = Direction.values();
-				d = dirs[(int)(Math.random()*dirs.length)];
-				if(gc.isMoveReady(id)&&gc.canMove(id,d))
-					gc.moveRobot(id,d);
+				dir = dirs[(int)(Math.random()*dirs.length)];
+				if (gc.isMoveReady(id) && gc.canMove(id,dir))
+					gc.moveRobot(id,dir);
 					
 			}
 		}
@@ -123,9 +123,9 @@ public class WorkerBot extends Bot {
 					if (gc.karboniteAt(dest) == 0)
 						targets.remove(id);
 					else{
-						d = loc.directionTo(dest);
-					if (gc.canHarvest(id,d))
-						gc.harvest(id,d);
+						dir = loc.directionTo(dest);
+					if (gc.canHarvest(id,dir))
+						gc.harvest(id,dir);
 					}
 				}
 				
@@ -133,9 +133,9 @@ public class WorkerBot extends Bot {
 				if (gc.karboniteAt(dest) == 0)
 					targets.remove(id);
 				else{
-					d = loc.directionTo(dest);
-				if(gc.canHarvest(id,d))
-					gc.harvest(id,d);
+					dir = loc.directionTo(dest);
+				if(gc.canHarvest(id,dir))
+					gc.harvest(id,dir);
 				}
 			}
 		}
@@ -150,9 +150,9 @@ public class WorkerBot extends Bot {
 	public boolean tryReplicate(){
 		if (gc.karbonite() > 15){
 			if (dest != null){
-				d = loc.directionTo(dest);
-				if(gc.canReplicate(id,d)){
-					gc.replicate(id,d);
+				dir = loc.directionTo(dest);
+				if(gc.canReplicate(id,dir)){
+					gc.replicate(id,dir);
 					return true;
 				}
 			}
@@ -219,20 +219,20 @@ public class WorkerBot extends Bot {
 				}
 			}
 		}
-		// Build up to 2 factories if available
+		// Buildin factories bois
 	    if (dest == null){
 	    	if (logs.statistics().get("Factory") < gc.karbonite()/200+3 && gc.karbonite() > bc.bcUnitTypeBlueprintCost(UnitType.Factory)){
 	    		Team enemyTeam = logs.getOtherTeam();
 				VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,80,enemyTeam);
 				VecUnit allies = gc.senseNearbyUnitsByTeam(loc,25,logs.getOurTeam());
 				if (allies.size() > 3) {
-	    			d = Fuzzy.findAdjacent(loc,gc);
-					if (gc.canBlueprint(id,UnitType.Factory,d)){
-						gc.blueprint(id,UnitType.Factory,d);
-						targets.put(id,loc.add(d));
+	    			dir = Fuzzy.findAdjacent(loc,gc);
+					if (gc.canBlueprint(id,UnitType.Factory,dir)){
+						gc.blueprint(id,UnitType.Factory,dir);
+						targets.put(id,loc.add(dir));
 						logs.updateStats("Factory",1);
 						//bps.put(gc.senseNearbyUnitsByType(loc.add(d),1,UnitType.Factory).get(0).id(),1);
-						bps.put(gc.senseUnitAtLocation(loc.add(d)).id(),1);
+						bps.put(gc.senseUnitAtLocation(loc.add(dir)).id(),1);
 						dest = targets.get(id);
 					}
 				}
@@ -245,13 +245,13 @@ public class WorkerBot extends Bot {
 					gc.karbonite() > bc.bcUnitTypeBlueprintCost(UnitType.Rocket)){
 				VecUnit allies = gc.senseNearbyUnitsByTeam(loc,25,gc.team());
 				if (allies.size() > 4){
-					d = Fuzzy.findAdjacent(loc,gc);
-					if(gc.canBlueprint(id,UnitType.Rocket,d)){
-						gc.blueprint(id,UnitType.Rocket,d);
-						targets.put(id,loc.add(d));
+					dir = Fuzzy.findAdjacent(loc,gc);
+					if(gc.canBlueprint(id,UnitType.Rocket,dir)){
+						gc.blueprint(id,UnitType.Rocket,dir);
+						targets.put(id,loc.add(dir));
 						logs.updateStats("Rocket",1);
-						rockets.put(gc.senseUnitAtLocation(loc.add(d)).id(),0);
-						bps.put(gc.senseUnitAtLocation(loc.add(d)).id(),1);
+						rockets.put(gc.senseUnitAtLocation(loc.add(dir)).id(),0);
+						bps.put(gc.senseUnitAtLocation(loc.add(dir)).id(),1);
 						dest = targets.get(id);
 					}
 				}
@@ -259,7 +259,7 @@ public class WorkerBot extends Bot {
 		}
 
 		// Assign repairs
-		if(dest == null){
+		if (dest == null){
 			VecUnit vec = gc.senseNearbyUnitsByTeam(loc,50,logs.getOurTeam());
 			if (vec.size() > 0){
 				for (int i = 0; i < vec.size(); i++){
@@ -274,7 +274,7 @@ public class WorkerBot extends Bot {
 		}
 
 		// Continue trying to assign a task when workers should continue working
-		if(dest == null){
+		if (dest == null){
 			if(gc.round() < 100){
 				// Find the closest deposit
 				Comparator<MapLocation> comp = (loc1,loc2) -> Long.compare(loc1.distanceSquaredTo(loc),loc2.distanceSquaredTo(loc));

@@ -45,6 +45,7 @@ public class Logistics {
 			otherTeam = Team.Blue;
 		else
 			otherTeam = Team.Red;
+		unitPriorities = new HashMap<UnitType,Integer>();
 		initStats();
 		scoutKarbonite();
 		setupPriorities();

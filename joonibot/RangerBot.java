@@ -42,7 +42,7 @@ public class RangerBot extends Bot {
 			if (opposite)
 				d = bc.bcDirectionOpposite(d);
 			for (int i = 0; i < Fuzzy.rotateOrder.length; i++){
-				Direction newDir = Fuzzy.tryRotate(dir,Fuzzy.rotateOrder[i]);
+				Direction newDir = Fuzzy.tryRotate(d,Fuzzy.rotateOrder[i]);
 				if(gc.canMove(id,newDir)){
 					gc.moveRobot(id,newDir);
 					loc = loc.add(newDir);
@@ -83,7 +83,7 @@ public class RangerBot extends Bot {
 			testMove(false);
 		else if(unit.health() < unit.maxHealth())
 			testMove(true);
-		enemy = enemyAtRange(unit.attackRange());
+		enemy = unitAtRange(unit.attackRange(),enemyTeam);
 		if (enemy != null){
 			tryAttack(enemy.id());
 		}

@@ -68,7 +68,7 @@ public class BFS {
 				if (pm.onMap(next) && pm.isPassableTerrainAt(next) != 0){
 					if (!paths.keySet().contains(next.toString())){
 						locations.add(next);
-						paths.put(next.toString(),bc.bcDirectionOpposite(d));
+						paths.put(next.toString(),bc.bcDirectionOpposite(dir));
 						charmap[(int)next.getX()][(int)next.getY()] = bc.bcDirectionOpposite(dir).toString();
 					}
 				}
@@ -111,8 +111,8 @@ public class BFS {
 					if (pm.onMap(next) && pm.isPassableTerrainAt(next) != 0 && !unitlocs.contains(next.toString())){
 						if (!paths.keySet().contains(next.toString())){
 							locations.offer(next);
-							paths.put(next.toString(),bc.bcDirectionOpposite(d));
-							charmap[(int)next.getX()][(int)next.getY()] = bc.bcDirectionOpposite(d).toString();
+							paths.put(next.toString(),bc.bcDirectionOpposite(dir));
+							charmap[(int)next.getX()][(int)next.getY()] = bc.bcDirectionOpposite(dir).toString();
 							if (!full&&next.toString().equals(unit.location().mapLocation().toString())){
 								return paths;
 							}

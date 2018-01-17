@@ -34,15 +34,14 @@ public class HealerBot extends Bot {
 		if (vec.size() > 0){
         	Unit found = null;
 			Unit chosen = null;
-			int chosenUnitIndex = 0;
+			int chosenUnitIndex = 0, maxPriority = 0, currPriority = 0;
 			long hp;
-			long closestDistance = Long.MAX_VALUE, currDistance = Long.MAX_VALUE;
 			for (int i = 0; i< vec.size(); i++){
 				found = vec.get(i);
-				if (found.hp() < found.maxHeath()){
-					currDistance = found.location().mapLocation().distancedSquaredTo(loc);
-					if (currDistance > closestDistance){
-						closestDistance = currDistance;
+				if (found.health() < found.maxHealth()){
+					currPriority = logs.getUnitPriority(found.unitType());
+					if (currPriority > maxPriority || (currPriority == maxPriority && vec.get(chosenUnitIndex).health() < found.health())){
+						maxPriority = currPriority;
 						chosenUnitIndex = i;
 					}
 				}
@@ -50,7 +49,7 @@ public class HealerBot extends Bot {
 			chosen = vec.get(chosenUnitIndex);
 			hp = chosen.health();
 			return chosen;
-        }
+		}
         return null;
 	}
 
@@ -71,7 +70,7 @@ public class HealerBot extends Bot {
 			tryMove();
 		if (ally != null)
 			tryAttack(ally.id());
-		ally = unitAtRange(unit.attackRange(), logs.getOurTeam();
+		ally = unitAtRange(unit.attackRange(), logs.getOurTeam());
 		if (ally != null)
 			tryAttack(ally.id());	
 	}
