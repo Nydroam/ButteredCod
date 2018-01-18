@@ -18,50 +18,16 @@ public class BFS{
 		
 	}
 
-
-	public HashMap<String,Direction> fullSearch(MapLocation start){
-		long st = System.currentTimeMillis();
-		LinkedList<MapLocation> locations = new LinkedList<MapLocation>();
-		HashMap<String,Direction> paths = new HashMap<String,Direction>();
-
-		//charmap = new String[(int)pm.getWidth()][(int)pm.getHeight()];
-		locations.offer(start);
-		Direction[] directions = {Direction.Northeast,Direction.Southwest,Direction.Northwest,Direction.Southeast,Direction.North,Direction.South,Direction.East,Direction.West};
-		int steps = 0;
-		while(!locations.isEmpty()){
-			MapLocation current = locations.poll();
-			for(Direction d : directions){
-				if(d != null){
-					MapLocation next = current.add(d);
-					if(!pm.onMap(next)){}
-					else if(pm.isPassableTerrainAt(next)==0){}
-					else{
-						if (!paths.keySet().contains(next.toString())){
-							locations.offer(next);
-							paths.put(next.toString(),bc.bcDirectionOpposite(d));
-							//charmap[(int)next.getX()][(int)next.getY()]=bc.bcDirectionOpposite(d).toString();
-							
-						}
-					}
-					
-				}
-			}
-			steps++;
-		}
-		System.out.println("BFS FULL TIME: "+(System.currentTimeMillis()-st));
-		return paths;
-	}
-
 	//Starting location, unit that wants to move, whether or not to do a full search of the map or only enough to path the unit
 	public HashMap<String,Direction> search(MapLocation start, Unit u, boolean full){
-		//System.out.println("BFSING");
+		System.out.println("BFSING");
 		//we offer the starting location and then fill in all adjacent locations with directions pointing to it
 		//we offer each added location and then poll off the queue and repeat with fillign in adjacent locations
 
 		LinkedList<MapLocation> locations = new LinkedList<MapLocation>();
 		HashMap<String,Direction> paths = new HashMap<String,Direction>();
 
-		//charmap = new String[(int)pm.getWidth()][(int)pm.getHeight()];
+		charmap = new String[(int)pm.getWidth()][(int)pm.getHeight()];
 		locations.offer(start);
 		Direction[] directions = Direction.values();
 		VecUnit units = gc.senseNearbyUnits(start,500);
@@ -89,7 +55,7 @@ public class BFS{
 						if (!paths.keySet().contains(next.toString())){
 							locations.offer(next);
 							paths.put(next.toString(),bc.bcDirectionOpposite(d));
-							//charmap[(int)next.getX()][(int)next.getY()]=bc.bcDirectionOpposite(d).toString();
+							charmap[(int)next.getX()][(int)next.getY()]=bc.bcDirectionOpposite(d).toString();
 							if(!full&&next.toString().equals(u.location().mapLocation().toString())){
 								//if the pathing reaches the unit, end the search
 								return paths;
@@ -128,8 +94,6 @@ public class BFS{
 						v = ">";
 					if(s.equals("West"))
 						v = "<";
-					if(s.equals("Center"))
-						v = "O";
 					System.out.print(v);
 				}
 				else

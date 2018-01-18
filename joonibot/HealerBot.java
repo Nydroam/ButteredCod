@@ -58,19 +58,19 @@ public class HealerBot extends Bot {
 	 */
 	@Override
 	public void act(){
-		Unit ally = unitAtRange(2500, logs.getOurTeam());
+		Unit ally = unitAtRange(2500, gc.team());
 		if (ally != null){
 			tryAttack(ally.id());
 			dest = ally.location().mapLocation();
 		}
-		ally = unitAtRange(unit.attackRange(), logs.getOurTeam());
+		ally = unitAtRange(unit.attackRange(),  gc.team());
 		if (ally != null)
 			tryAttack(ally.id());
 		if (dest != null)
 			tryMove();
 		if (ally != null)
 			tryAttack(ally.id());
-		ally = unitAtRange(unit.attackRange(), logs.getOurTeam());
+		ally = unitAtRange(unit.attackRange(),  gc.team());
 		if (ally != null)
 			tryAttack(ally.id());	
 	}

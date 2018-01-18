@@ -39,7 +39,7 @@ public class RangerBot extends Bot{
 		if(gc.team()==Team.Red)
             enemyTeam = Team.Blue;
 
-		VecUnit enem = gc.senseNearbyUnitsByTeam(loc,100,enemyTeam);
+		VecUnit enem = gc.senseNearbyUnitsByTeam(loc,9,enemyTeam);
 		ArrayList<Unit> enemies = new ArrayList<Unit>();
 		for(int i = 0; i < enem.size(); i++)
 			if(enem.get(i).unitType()==UnitType.Ranger)
@@ -50,11 +50,11 @@ public class RangerBot extends Bot{
 			if(all.get(i).unitType()==UnitType.Ranger)
 				allies.add(all.get(i));
 
-		VecUnit close = gc.senseNearbyUnitsByTeam(loc,3,enemyTeam);
+		VecUnit close = gc.senseNearbyUnitsByTeam(loc,2,enemyTeam);
 		if(close.size()>0||unit.attackHeat()>=10){
 			testMove(true);
 		}
-		else if(enemies.size()<allies.size())
+		else if(4<allies.size())
 			testMove(false);
 		else if(gc.senseNearbyUnitsByType(loc,9,UnitType.Factory).size()>0){}
 		else if(unit.health()<unit.maxHealth())

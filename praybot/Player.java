@@ -105,7 +105,7 @@ public class Player{
 						Direction[] dirs = Direction.values();
 
 						Direction d = dirs[(int)(Math.random()*dirs.length)];
-						if(gc.karbonite()>15&&gc.canReplicate(u.id(),d)){//try replicating then moving
+						if(gc.karbonite()>15&&gc.canReplicate(u.id(),d)&&(gc.karbonite()>100||gc.round()>749)) {//try replicating then moving
 							gc.replicate(u.id(),d);
 					
 						//d = Fuzzy.findAdjacent(u.location().mapLocation(),gc);
