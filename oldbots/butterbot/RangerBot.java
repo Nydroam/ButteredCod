@@ -28,19 +28,24 @@ public class RangerBot extends Bot{
 	}
 
 	public void act(){
-		
-		Unit enemy = enemyAtRange(unit.attackRange());
-		if(enemy!=null){
-			if(tryAttack(enemy.id())){}
-				
+		long attackHeat = unit.attackHeat();
+		long moveHeat = unit.movementHeat();
+
+
+		Unit enemy = null;
+		if(attackHeat<10){
+			enemy = enemyAtRange(unit.attackRange());
+			
+			if(enemy!=null){
+				if(tryAttack(enemy.id())){
+					attackHeat = unit.attackHeat();
+				}
+			}
 		}
 
-		Team enemyTeam = Team.Red;
-		if(gc.team()==Team.Red)
-            enemyTeam = Team.Blue;
 
-		VecUnit enem = gc.senseNearbyUnitsByTeam(loc,9,enemyTeam);
-		ArrayList<Unit> enemies = new ArrayList<Unit>();
+		//VecUnit enem = gc.senseNearbyUnitsByTeam(loc,100,enemyTeam);
+		/*ArrayList<Unit> enemies = new ArrayList<Unit>();
 		for(int i = 0; i < enem.size(); i++)
 			if(enem.get(i).unitType()==UnitType.Ranger)
 				enemies.add(enem.get(i));
@@ -48,25 +53,34 @@ public class RangerBot extends Bot{
 		ArrayList<Unit> allies = new ArrayList<Unit>();
 		for(int i = 0; i < all.size(); i++)
 			if(all.get(i).unitType()==UnitType.Ranger)
-				allies.add(all.get(i));
-
-		VecUnit close = gc.senseNearbyUnitsByTeam(loc,2,enemyTeam);
-		if(close.size()>0||unit.attackHeat()>=10){
-			testMove(true);
+				allies.add(all.get(i));*/
+		//VecUnit allies = gc.senseNearbyUnitsByTeam(loc,25,gc.team());
+		//VecUnit close = gc.senseNearbyUnitsByTeam(loc,2,enemyTeam);
+		//if(close.size()>0||attackHeat>=10){
+			//testMove(true);
+		//}
+		//else if(0<allies.size())
+			//testMove(false);
+		//else if(gc.senseNearbyUnitsByType(loc,9,UnitType.Factory).size()>0){}
+		//else if(unit.health()<unit.maxHealth())
+		//	testMove(true);
+		if(moveHeat<10){
+			if(attackHeat>=10)
+				testMove(true);
+			else
+				testMove(false);
+			
 		}
-		else if(4<allies.size())
-			testMove(false);
-		else if(gc.senseNearbyUnitsByType(loc,9,UnitType.Factory).size()>0){}
-		else if(unit.health()<unit.maxHealth())
-			testMove(true);
-		enemy = enemyAtRange(unit.attackRange());
-		if(enemy!=null){
+		if(attackHeat<10){
+			enemy = enemyAtRange(unit.attackRange());
+			if(enemy!=null){
 
-			if(tryAttack(enemy.id())){}
-				
+				if(tryAttack(enemy.id())){}
+					
+			}
 		}
 
-		if(gc.isMoveReady(id) ){
+		if(gc.isMoveReady(id)){
 			if(gc.planet()==Planet.Mars){
 				if (gc.senseNearbyUnitsByTeam(loc,2500,enemyTeam).size()>0||gc.round()<700){
 					Direction d = Fuzzy.findAdjacent(loc,gc);
@@ -74,7 +88,7 @@ public class RangerBot extends Bot{
 				gc.moveRobot(id,d);
 			}
 				
-			}else if (gc.senseNearbyUnitsByTeam(loc,2500,enemyTeam).size()==0){
+			}else if (gc.getTimeLeftMs()>5000&&gc.senseNearbyUnitsByTeam(loc,2500,enemyTeam).size()==0) {
 			Direction d = Fuzzy.findAdjacent(loc,gc);
 			if(gc.canMove(id,d))
 				gc.moveRobot(id,d);
@@ -96,7 +110,7 @@ public class RangerBot extends Bot{
 				if(gc.canSenseUnit(i)){
 					Unit rocket = gc.unit(i);
 					MapLocation rloc = rocket.location().mapLocation();
-					if(rloc.distanceSquaredTo(loc)<25||logs.rallyPoints().size()==0){
+					if(rloc.distanceSquaredTo(loc)<50||logs.rallyPoints().size()==0){
 					targets.put(id,rloc);
 					dest = targets.get(id);
 					break;}

@@ -21,18 +21,25 @@ public class Player{
         LinkedList<String> rallyPoints = logs.rallyPoints();
 		HashMap<String,Direction> paths = null;
 		MapLocation loc1 = null;
-
+		long time = 0;
 		if(gc.planet()==Planet.Earth){
 			
+			//set rally point at enemy base
+			Unit first = units.get(0);
+			if(pm.getHeight()*pm.getWidth()<=225)
+				rallyPoints.add(new MapLocation(gc.planet(),(int)pm.getWidth()-first.location().mapLocation().getX(),(int)pm.getHeight()-first.location().mapLocation().getY()).toJson()) ;
 			//pre-set research
 			
 			gc.queueResearch(UnitType.Worker);
 			gc.queueResearch(UnitType.Healer);
-
+			gc.queueResearch(UnitType.Healer);
+			gc.queueResearch(UnitType.Ranger);
 			gc.queueResearch(UnitType.Rocket);
 			gc.queueResearch(UnitType.Ranger);
 			
-			gc.queueResearch(UnitType.Ranger);
+			
+			
+			
 			gc.queueResearch(UnitType.Healer);
 			gc.queueResearch(UnitType.Worker);
 			gc.queueResearch(UnitType.Worker);
@@ -44,14 +51,19 @@ public class Player{
 			Bot bot = null;
 			
 			while(true){
+
 				logs.updateUnits();
 				units = logs.units();
 				System.out.println("Round: "+ gc.round());
 				//System.out.println("Stats: " + logs.statistics());
 				System.out.println("Time Left: " + gc.getTimeLeftMs()/1000.0 + "seconds");
-				
+				System.out.println(gc.getTimeLeftMs());
+				if(gc.getTimeLeftMs()<500){
+					gc.nextTurn();
+					continue;
+				}
 				//removing empty visible rally points, leaving the most recent one if there aren't any left
-				
+				time = System.currentTimeMillis();
 				for(int i = 0; i < rallyPoints.size(); i++){
 					MapLocation rLoc = bc.bcMapLocationFromJson(rallyPoints.peek());
 					if(gc.canSenseLocation(rLoc)&&gc.senseNearbyUnitsByTeam(rLoc,0,enemyTeam).size()==0)
@@ -74,6 +86,8 @@ public class Player{
 							rallyPoints.offer(eloc.toJson());
 					}
 				}
+
+				System.out.println("Rally time: " + (System.currentTimeMillis()-time));
 				if(rallyPoints.size()>0&&gc.round()%100==0){
 					rallyPoints.offer(rallyPoints.poll());
 				}
@@ -86,24 +100,23 @@ public class Player{
 					//testPath.printMap();
 				}
 				
-
+				time = System.currentTimeMillis();
 				for(int i = 0; i < units.size(); i++){
-					logs.updateUnits();
+					//logs.updateUnits();
 					units = logs.units();
 					Unit u = null;
-					if(i < units.size())
-						u = units.get(i);
-					else
-						break;
+					
+					u = units.get(i);
+					UnitType type = u.unitType();
 					if(u.location().isInGarrison()){
 						continue;
 					}
 					MapLocation loc = u.location().mapLocation();
-					if(u.unitType() == UnitType.Factory){
+					if(type == UnitType.Factory){
 						bot = new FactoryBot(u,gc,logs);
 						bot.act();
 					}
-					if(u.unitType() == UnitType.Ranger){
+					if(type == UnitType.Ranger){
 					
 							bot = new RangerBot(u,gc,logs,paths);
 						if(gc.round()<100)
@@ -111,26 +124,33 @@ public class Player{
 						else
 							bot.act2();
 					}
-					if(u.unitType() == UnitType.Knight){
+					if(type == UnitType.Knight){
 						bot = new KnightBot(u,gc,logs);
 						bot.act();
 					}
-					if(u.unitType()==UnitType.Worker){
+					if(type==UnitType.Worker){
 						bot = new WorkerBot(u,gc,logs);
 						bot.act();
 					}
-					if(u.unitType()==UnitType.Healer){
+					if(type==UnitType.Healer){
 						bot = new HealerBot(u,gc,logs);
-						bot.act();
+						if(gc.round()<100)
+							bot.act();
+						else
+							bot.act2();
 					}
-					if(u.unitType()==UnitType.Rocket){
+					if(type==UnitType.Rocket){
 						bot = new RocketBot(u,gc,logs);
 						bot.act();
 					}
 					
 					
 				}
-			
+			System.out.println("Unit time: " + (System.currentTimeMillis()-time));
+			if(gc.round()%10==0){
+				System.runFinalization();
+				System.gc();
+			}
 				gc.nextTurn();
 
 			}
@@ -143,7 +163,6 @@ public class Player{
 				System.out.println("Round: "+ gc.round());
 				//System.out.println("Stats: " + logs.statistics());
 				System.out.println("Time Left: " + gc.getTimeLeftMs()/1000.0 + "seconds");
-
 
 				//removing empty visible rally points, leaving the most recent one if there aren't any left
 				
@@ -244,8 +263,10 @@ public class Player{
 					}
 					
 				}
-
-				
+				if(gc.round()%10==0){
+				System.runFinalization();
+				System.gc();
+				}
 				gc.nextTurn();
 			}
 		}

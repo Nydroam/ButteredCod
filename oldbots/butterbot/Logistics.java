@@ -12,6 +12,7 @@ public class Logistics{
 	private HashMap<Integer, Integer> blueprints;
 	private HashMap<Integer,MapLocation> targets;
 	private HashMap<Integer, Integer> rockets;
+private HashMap<UnitType,Integer> unitPriorities;	
 
 	private LinkedList<String> rallyPoints;
 	private HashMap<ArrayList<MapLocation>, Integer> MarsInfo;
@@ -27,6 +28,8 @@ public class Logistics{
 		rallyPoints = new LinkedList<String>();
 		initStats();
 		scoutKarbonite();
+		unitPriorities = new HashMap<UnitType,Integer>();
+		setupPriorities();
 	}
 
 	//accessors
@@ -37,6 +40,26 @@ public class Logistics{
 	public HashMap<Integer,MapLocation> targets(){return targets;}
 	public HashMap<Integer, Integer> rockets(){return rockets;}
 	public LinkedList<String> rallyPoints(){return rallyPoints;}
+
+	public int getUnitPriority(UnitType unitType){ return unitPriorities.get(unitType); }
+
+/**
+	 * Sets up the unitPriorities hashmap used to determine which enemy should be annihilated first.
+	 */
+	private void setupPriorities(){
+		for (UnitType unitType : UnitType.values()){
+			if (unitType == unitType.Healer)
+				unitPriorities.put(unitType,4);
+			else if (unitType == UnitType.Ranger || unitType == UnitType.Mage)
+				unitPriorities.put(unitType,3);
+			else if (unitType == UnitType.Knight)
+				unitPriorities.put(unitType,2);
+			else
+				unitPriorities.put(unitType,1);
+		}
+	}
+
+
 	//Scans map for initial karbonite deposits and records locations
 	public void scoutKarbonite(){
 		long start = System.currentTimeMillis();

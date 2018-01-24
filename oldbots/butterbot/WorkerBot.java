@@ -15,9 +15,10 @@ public class WorkerBot extends Bot{
 		if(targets.keySet().contains(id)){
 			dest = targets.get(id);
 		}
-		assignTarget();
+		if(gc.round()%3==0)
+			assignTarget();
 
-		if(logs.statistics().get("Worker") < logs.karbLocations().size()/20 + 10 &&gc.round()<25){//Limiting amount of workers
+		if(logs.statistics().get("Worker") < logs.karbLocations().size()/30 + 7 &&gc.round()<25){//Limiting amount of workers
 
 			if(tryReplicate())
 				logs.updateStats("Worker",1);
@@ -41,7 +42,7 @@ public class WorkerBot extends Bot{
 	public boolean tryMove(){
 		
 		//Pathing variables
-		if(gc.isMoveReady(id)&&dest!=null&&gc.round()<25){
+		if(gc.isMoveReady(id)&&dest!=null&&(gc.getTimeLeftMs()>10000||gc.round()<30)){
 			System.out.println("BFSING");
 		BFS rally = new BFS(gc);
 		HashMap<String,Direction> paths;
@@ -185,7 +186,7 @@ public class WorkerBot extends Bot{
 					for(int j = 0; j < vec.size(); j++){
 						Unit curr = vec.get(j);
 		      			if(bps.keySet().contains(curr.id()))//check to see if this is actually one of our blueprints
-		    				if(bps.get(curr.id())<8){//assign up to # workers to this blueprint
+		    				if(bps.get(curr.id())<6){//assign up to # workers to this blueprint
 		    					
 		    					if(dest!=null){
 		    						//System.out.println("CHIIIL IM WORKING");
@@ -199,11 +200,10 @@ public class WorkerBot extends Bot{
 		      					break;
 		      				}
 		      		}
-		      	
 	    }
 
-	    if(dest==null){//blueprint factory
-	    	if(logs.statistics().get("Factory")<gc.karbonite()/200+2&&gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Factory)){
+	    if(true){//blueprint factory
+	    	if(logs.statistics().get("Factory")<logs.karbLocations().size()/70+2&&gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Factory)){
 	    		//build up to 2 factories when available
 
 	    		Team enemyTeam = Team.Red;
@@ -211,7 +211,7 @@ public class WorkerBot extends Bot{
 					enemyTeam = Team.Blue;
 				VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,80,enemyTeam);
 				VecUnit allies = gc.senseNearbyUnitsByTeam(loc,16,gc.team());
-				if(allies.size()>4) {
+				if(allies.size()>2) {
 	    		
 	    		d = Fuzzy.findAdjacent(loc,gc);
 	    		
@@ -227,10 +227,10 @@ public class WorkerBot extends Bot{
 	    	}
 		}
 
-		if(dest == null){//blueprint rocket
-			if(gc.researchInfo().getLevel(UnitType.Rocket)>0&&logs.statistics().get("Rocket")<2&&gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Rocket)){
+		if(true){//blueprint rocket
+			if(gc.researchInfo().getLevel(UnitType.Rocket)>0&&logs.statistics().get("Rocket")<2&&gc.karbonite()>100){
 				VecUnit allies = gc.senseNearbyUnitsByTeam(loc,25,gc.team());
-				if(allies.size()>4){
+				if(allies.size()>1){
 				d = Fuzzy.findAdjacent(loc,gc);
 				if(gc.canBlueprint(id,UnitType.Rocket,d)&&Fuzzy.numAdjacent(loc.add(d),gc)>2){
 					gc.blueprint(id,UnitType.Rocket,d);

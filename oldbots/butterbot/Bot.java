@@ -13,6 +13,7 @@ public class Bot{
 	protected HashMap<Integer,MapLocation> targets;
 	protected HashMap<Integer,Integer> rockets;
 	protected LinkedList<String> rallyPoints;
+	protected Team enemyTeam;
 	protected Direction d;
 
 	public Bot(Unit u, GameController gc, Logistics logs){
@@ -24,6 +25,9 @@ public class Bot{
 		targets = logs.targets();
 		rockets = logs.rockets();
 		rallyPoints = logs.rallyPoints();
+		enemyTeam = Team.Red;
+		if(gc.team()==Team.Red)
+            enemyTeam = Team.Blue;
 	}
 
 	public void act(){}
@@ -53,10 +57,9 @@ public class Bot{
 		}
 		return false;
 	}
+	public Unit unitAtRange(long radius, Team whichTeam){return null;}
 	public Unit enemyAtRange(long radius){
-		Team enemyTeam = Team.Red;
-		if(gc.team()==Team.Red)
-            enemyTeam = Team.Blue;
+		
         VecUnit vec = gc.senseNearbyUnitsByTeam(loc,radius,enemyTeam);
 
         if(vec.size()>0){
@@ -66,17 +69,21 @@ public class Bot{
         	int priority = 0;
         	long hp = 500;
         	for(int i = 0; i < vec.size(); i++){
-        		UnitType ut = vec.get(i).unitType();
+        		Unit u = vec.get(i);
+        		UnitType ut = u.unitType();
+        		int uid = u.id();
+        		MapLocation uloc = u.location().mapLocation();
 
-        		if(gc.canAttack(id,vec.get(i).id())){//||loc.distanceSquaredTo(vec.get(i).location().mapLocation())>10){
-        			enemy = vec.get(i);
+        		if(gc.canAttack(id,uid)||loc.distanceSquaredTo(uloc)>10) {
+        			enemy = u;
+        			long ehp = u.health();
         			if(ut==UnitType.Mage||ut==UnitType.Healer){
         				if(priority<4){
 	        				chosen = enemy;
 	        				priority = 4;
-	        				hp = enemy.health();
+	        				hp = ehp;
 	        			}else if(enemy.health()<hp){
-	        				hp = enemy.health();
+	        				hp = ehp;
 	        				chosen = enemy;
 	        			}
         			}
@@ -84,16 +91,16 @@ public class Bot{
 	        			if(priority<3){
 	        				chosen = enemy;
 	        				priority = 3;
-	        				hp = enemy.health();
-	        			}else if(enemy.health()<hp){
-	        				hp = enemy.health();
+	        				hp = ehp;
+	        			}else if(ehp<hp){
+	        				hp = ehp;
 	        				chosen = enemy;
 	        			}
 	        		}else{
 	        			if(priority <1){
-	        				if(enemy.health()<hp){
+	        				if(ehp<hp){
 	        					chosen = enemy;
-	        					hp = enemy.health();
+	        					hp = ehp;
 	        				}
 	        			}
 	        		}

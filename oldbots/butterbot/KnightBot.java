@@ -6,7 +6,7 @@ public class KnightBot extends Bot{
 	}
 
 	public void act(){
-		Unit enemy = enemyAtRange(200);
+		Unit enemy = enemyAtRange(100);
 		if(enemy!=null){//attempt to attack main target, set destination if exists
 			tryAttack(enemy.id());
 			dest = enemy.location().mapLocation();
