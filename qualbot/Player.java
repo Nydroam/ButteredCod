@@ -19,6 +19,29 @@ public class Player{
         	//Queue Research Here(?)
 
         	//------------------Map Preprocessing---------------------
+
+        	/**
+        	 * we loop through all our units at the beginning of the game
+        	 * and use their locations to set up areas in MapScanner by
+        	 * using fillArea(loc). We add the unit to the corresponding
+        	 * MapData created or the existing MapData.
+        	 */
+        	MapScanner scan = new MapScanner(gc);
+        	VecUnit units = gc.myUnits();
+        	for(int i = 0; i < units.size(); i++){
+        		Unit u = units.get(i);
+	        	MapLocation loc = u.location().mapLocation();
+	        	int index = scan.findArea(loc);
+	        	int id = u.id();
+	        	if(index == -1){
+	        		scan.fillArea(loc).addUnit(id);
+	        	}else{
+	        		scan.areas().get(index).addUnit(id);
+	        	}
+        	}
+        	//scan.areas().stream().forEach(m->System.out.println("Area: " + m.unitList()));
+        	scan.printMaps();
+
         	//--------------End Map Preprocessing---------------------
         	while(true){//each iteration of the loop is a round
 
