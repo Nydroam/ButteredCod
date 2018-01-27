@@ -11,11 +11,11 @@ import java.util.LinkedList;
 public class MapScanner{
 
 	//Game Variables
-	GameController gc;
-	PlanetMap pm;
+	private GameController gc;
+	private PlanetMap pm;
 
 	//ArrayList of Areas (Any connected paths)
-	ArrayList<MapData> areas;
+	private ArrayList<MapData> areas;
 
 	public MapScanner(GameController gc){
 		this.gc = gc;
@@ -75,8 +75,10 @@ public class MapScanner{
 				MapLocation next = current.add(d);
 				if(!pm.onMap(next) || locations.contains(next.toJson())) {continue;}
 				if(pm.isPassableTerrainAt(next)!=0){
-					if(pm.initialKarboniteAt(next)>0)
+					if(pm.initialKarboniteAt(next)>0){
 						newArea.karbLocations().put(next.toJson(),(int)pm.initialKarboniteAt(next));
+						newArea.karbQueue().offer(next);
+					}
 					locations.add(next.toJson());
 					frontier.offer(next);
 				}

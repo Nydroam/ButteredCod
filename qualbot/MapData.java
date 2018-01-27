@@ -1,7 +1,10 @@
 import bc.*;
+import java.util.Comparator;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.HashMap;
-
+import java.util.PriorityQueue;
+import java.util.Iterator;
 /**
  * MapData stores information about MapLocations, Units, and karbonite locations and amounts
  * within an area and is to be updated and used by Units for acting
@@ -9,27 +12,42 @@ import java.util.HashMap;
 public class MapData{
 	
 	//Game Variables
-	GameController gc;
-	PlanetMap pm;
+	private GameController gc;
+	private PlanetMap pm;
 
 	//An ArrayList containing locations within this Area
 	private ArrayList<String> locations;
 
 	//HashMap with locations of karbonite and the corresponding number of karbonite
 	private HashMap<String,Integer> karbLocations;
+	private LinkedList<MapLocation> karbQueue;
 
 	//List of unit ids that are in this area
 	private ArrayList<Integer> unitList;
+	private HashMap<Integer,Integer> blueprints;
+
+	//Unit Rally Points
+	private HashMap<String,HashMap<String,Direction>> rallyPoints;
+	private MapLocation lastSeen;
 
 	//Total amount of karbonite present based on karbLocations;
 	private int totalKarbs;
 
+	//Enemy Team
+	private Team enemyTeam;
 	public MapData(GameController gc){
 		this.gc = gc;
 		pm = gc.startingMap(gc.planet());
 		locations = new ArrayList<>();
 		karbLocations = new HashMap<String,Integer>();
+		karbQueue = new LinkedList<MapLocation>();
 		unitList = new ArrayList<>();
+		blueprints = new HashMap<Integer, Integer>();
+		
+		rallyPoints = new HashMap<String,HashMap<String,Direction>>();
+		enemyTeam = Team.Red;
+		if(gc.team()==Team.Red)
+			enemyTeam = Team.Blue;
 	}
 
 	//Accessors
@@ -37,6 +55,9 @@ public class MapData{
 	public HashMap<String,Integer> karbLocations() {return karbLocations;}
 	public ArrayList<Integer> unitList() {return unitList;}
 	public int totalKarbs() {return totalKarbs;}
+	public LinkedList<MapLocation> karbQueue() {return karbQueue;}
+	public HashMap<Integer, Integer> blueprints() {return blueprints;}
+	public HashMap<String,HashMap<String,Direction>> rallyPoints() {return rallyPoints;}
 
 	//mutators
 	public void addUnit(int u){
@@ -69,6 +90,39 @@ public class MapData{
 	 */
 	public boolean contains(int i){
 		return unitList.contains(i);
+	}
+
+	public void updateRallyPoints(){
+		Iterator<String> it = rallyPoints.keySet().iterator();
+		while(it.hasNext()){
+			MapLocation loc = bc.bcMapLocationFromJson((String)it.next());
+			if(gc.canSenseLocation(loc)){
+				if(gc.hasUnitAtLocation(loc)){
+					if(gc.senseUnitAtLocation(loc).team()==gc.team())
+						it.remove();
+				}else{
+					it.remove();
+				}
+			}
+		}
+		MapLocation centerLoc = new MapLocation(gc.planet(),(int)pm.getWidth()/2,(int)pm.getHeight()/2);
+		VecUnit enemyVec = gc.senseNearbyUnitsByTeam(centerLoc,pm.getWidth()*pm.getHeight(),enemyTeam);
+		for(int i = 0; i < enemyVec.size(); i++){
+			Unit enemy = enemyVec.get(i);
+			MapLocation loc = enemy.location().mapLocation();
+			if (contains(loc)){
+				if(enemy.unitType()==UnitType.Factory)
+					rallyPoints.put(loc.toJson(),null);
+				else
+					lastSeen = loc;
+			}
+		}		
+	}
+
+	public void createRallyPaths(String l){
+		if(rallyPoints.containsKey(l)){
+
+		}
 	}
 
 	/**

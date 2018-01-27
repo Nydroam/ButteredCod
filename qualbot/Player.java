@@ -1,4 +1,5 @@
 import bc.*;
+import java.util.ArrayList;
 
 public class Player{
 	public static void main(String[] args){
@@ -13,11 +14,10 @@ public class Player{
 		if(ourTeam==Team.Red)
             enemyTeam = Team.Blue;
 
-
         if(planet == Planet.Earth){//Earth Code
 
         	//Queue Research Here(?)
-
+        	gc.queueResearch(UnitType.Worker);
         	//------------------Map Preprocessing---------------------
 
         	/**
@@ -39,23 +39,77 @@ public class Player{
 	        		scan.areas().get(index).addUnit(id);
 	        	}
         	}
-        	//scan.areas().stream().forEach(m->System.out.println("Area: " + m.unitList()));
         	scan.printMaps();
 
-        	//--------------End Map Preprocessing---------------------
+        	//--------------End Map Preprocessing------------------------
+        	
+        	//--------------Logistics Preprocessing----------------------
+        	/* We use our data collected from the map to set up logistics
+        	 * such as rally points for workers at karbonite locations
+        	 * and for military units at enemy locations
+        	 */
+        	Logistics logs = new Logistics(gc);
+        	//----------End Logistics Preprocessing----------------------------
+
         	while(true){//each iteration of the loop is a round
 
         		//initialization of variables that change each round
         		long round = gc.round();
         		int timeLeft = gc.getTimeLeftMs();
-
+        		long time = System.currentTimeMillis();
         		//printing statements for debugging
         		System.out.println("Round: "+ round);
 				System.out.println("Time Left: " + timeLeft + " ms");
 
+				//--------RALLY POINT SETUP-------------------------
+				
+				scan.areas().stream().forEach( area -> area.updateRallyPoints());
+				//scan.areas().stream().forEach( area -> System.out.println(area.rallyPoints().keySet()));
+				//--------RALLY POINT END----------------------------
+
 				//------------------UNIT CODE-----------------------
 
+				//try{//failsafe
+					units = gc.myUnits();
+					//loop through our units, parsing by type
+					time = System.currentTimeMillis();
+					logs.updateUnits();
+					System.out.println("Update Time: " + (System.currentTimeMillis()-time));
+					System.out.println("PreAct");
+					for(int i = 0; i < units.size(); i++){
+						Unit u = units.get(i);
+						UnitType type = u.unitType();
+						int id = u.id();
+						if(u.location().isInGarrison()){
+							continue;
+						}
+						MapLocation loc = u.location().mapLocation();
+						
+						MapData area = scan.areas().get(scan.findArea(loc));
+						//System.out.println("Scan time " + (System.currentTimeMillis()-time));
+						//superclass bot to be specialized later
+						Bot bot = null;
+						if(type == UnitType.Worker){
+							bot = new WorkerBot(gc,pm,u,logs,area);
+						}
+						if(type == UnitType.Factory){
+							bot = new FactoryBot(gc,pm,u,logs,area);
+						}
+						if(type == UnitType.Ranger){
+							bot = new RangerBot(gc,pm,u,logs,area);
+						}
+						time = System.currentTimeMillis();
+						
+						bot.act();
+						
 
+						//System.out.println("Act Time: " + (System.currentTimeMillis()-time));
+					}
+					System.out.println("PostAct");
+				/*} catch(Exception e){
+					System.out.println("Exception Occurred: " + e.getMessage());
+					System.out.println(e.getStackTrace()[0]);
+				}*/
 
 				//--------------END UNIT CODE ----------------------
         		
