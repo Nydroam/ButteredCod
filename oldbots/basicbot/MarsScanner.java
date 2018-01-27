@@ -33,7 +33,7 @@ public class MarsScanner{
     private Planet planet;
     private int width;
     private int height;
-    private AuxMapLocation[][] v_map; //storing MapLocations in v_map to reduce API calls
+    private Cors[][] v_map; //storing MapLocations in v_map to reduce API calls
     
     //Player should pass a gc.startingMap(Planet.Mars)
     //and Planet.Mars (reduces API calls)
@@ -43,7 +43,7 @@ public class MarsScanner{
 	this.width = (int)map.getWidth();
 	this.height = (int)map.getHeight();
 	
-	v_map = new AuxMapLocation[height][width]; // [y][x]
+	v_map = new Cors[height][width]; // [y][x]
     }
 
     //fill the v_map with WALL or SPACE matching Mars
@@ -52,7 +52,7 @@ public class MarsScanner{
 	for (int y = 0; y < height; y++){
 	    for (int x = 0; x < width; x++){
 		MapLocation loc = new MapLocation(planet, x, y);
-		AuxMapLocation cors = new AuxMapLocation(loc);
+		Cors cors = new Cors(loc);
 		if (map.isPassableTerrainAt(loc) != 0){
 		    cors.setTile(SPACE);
 		}else{
@@ -111,7 +111,7 @@ public class MarsScanner{
 	return areas;
     }
 
-    // returns the average x_cor and y_cor
+    // returns the average max_x, min_x and max_y, min_y
     // if the spot is impassable, call landRandom()
     public MapLocation landingSpot(ArrayList<MapLocation> area){
 
@@ -213,7 +213,7 @@ public class MarsScanner{
 		    }   
 		}
 	    }
-	    printAllAreas();
+	    //printAllAreas();
 	  
 
 	    

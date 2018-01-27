@@ -1,13 +1,13 @@
 import bc.*;
 
-public class AuxMapLocation{
+public class Cors{
 
     private MapLocation loc;
     private int x;
     private int y;
     private int tile;
 
-    public AuxMapLocation(MapLocation loc){
+    public Cors(MapLocation loc){
 	this.loc = loc;
 	x = loc.getX();
 	y = loc.getY();
