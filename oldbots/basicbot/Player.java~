@@ -16,7 +16,6 @@ public class Player{
 
 		MarsScanner scn = new MarsScanner(gc.startingMap(Planet.Mars), Planet.Mars);
 		scn.loadVirtualMap();
-		scn.scan();
 		
 		//==============================
 		

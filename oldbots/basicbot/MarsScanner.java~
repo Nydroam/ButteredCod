@@ -1,0 +1,193 @@
+import bc.*;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+
+import java.lang.Integer;
+
+import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.PriorityQueue;
+import java.util.Comparator;
+import java.util.Random;
+import java.util.Scanner;
+
+public class MarsScanner{
+
+    private PlanetMap map;
+    private Planet planet;
+    private int width;
+    private int height;
+    private MapLocation[][] v_map; //storing MapLocations in v_map to reduce API calls
+    
+    //Player should pass a gc.startingMap(Planet.Mars)
+    //and Planet.Mars (reduces API calls)
+    public MarsScanner(PlanetMap map, Planet planet){
+	this.map = map;
+	this.planet = planet;
+	this.width = (int)map.getWidth();
+	this.height = (int)map.getHeight();
+	
+	v_map = new MapLocation[height][width]; // [y][x]
+	
+    }
+
+    //fill the v_map with WALL or SPACE matching Mars
+    public void loadVirtualMap(){
+	int real_y = height - 1;
+	for (int y = 0; y < height; y++){
+	    for (int x = 0; x < width; x++){
+
+		MapLocation cors = new MapLocation(planet, x, y);
+		v_map[real_y][x] = cors;
+	    }
+	    real_y--;
+	}
+	printMap();
+    }
+
+    public void scan(){
+	Comparator<ArrayList<MapLocation>> comp = new AreaComparator();
+	PriorityQueue<ArrayList<MapLocation>> areas = new PriorityQueue<ArrayList<MapLocation>>(10, comp);
+
+	for (int y = 0; y < height; y++){
+	    for (int x = 0; x < width; x++){
+		
+		if (map.isPassableTerrainAt(v_map[y][x]) != 0 &&
+		    !visited(areas, v_map[y][x])){
+		    
+		    ArrayList<MapLocation> temp = fill(y, x);
+		    areas.offer(temp);
+		    printArea(temp);
+		}
+	    }
+	}
+	
+    }
+    //Identifies a good area to land on, represented as ArrayList<MapLocation>
+    private ArrayList<MapLocation> fill(int x_start, int y_start){
+
+	
+	LinkedList<MapLocation> frontier = new LinkedList<MapLocation>(); //stores locations to be visited
+	LinkedList<Integer> growths = new LinkedList<Integer>(); //stores how much each area grew
+	ArrayList<MapLocation> area = new ArrayList<MapLocation>(); //stores locations visited
+
+	frontier.add(v_map[y_start][x_start]);
+
+	int strikes = 0; //keeps track of constant small growths, Ex: 1 x 8 area
+	while(!frontier.isEmpty()){ //while there are no tiles to be visited
+
+	    int curr_size = frontier.size(); //the current growth rate
+	    System.out.println(curr_size);
+	    //breaks if:
+	    //    current growthrate is less than the prev/1.5
+	    //    the area grew twice by 1 or 2 tiles
+	    if (!growths.isEmpty() && (double)curr_size < growths.getLast()/1.5 ||
+		strikes == 2){
+		break;
+	    }
+	    if (curr_size == 1 || curr_size == 2){
+		strikes++;
+	    }
+
+	    growths.add(curr_size);
+
+	    for (int j = 0; j < curr_size; j++){
+		// loop that marks visited
+		MapLocation curr = frontier.poll(); 
+		area.add(curr);
+
+		// adjacent locations
+		MapLocation[] adj = {
+		    curr.add(Direction.East),
+		    curr.add(Direction.North),
+		    curr.add(Direction.Northeast),
+		    curr.add(Direction.Northwest),
+		    curr.add(Direction.South),
+		    curr.add(Direction.Southeast),
+		    curr.add(Direction.Southwest),
+		    curr.add(Direction.West)
+		    
+		};
+		
+		for (int i = 0; i < 8; i++){
+		    // loop that marks next locations to be visited
+		    MapLocation temp = adj[i];
+
+		    if (inBounds(temp.getX(), temp.getY()) &&
+			!frontier.contains(temp)){
+
+			frontier.add(temp);
+		    }
+		    
+		}
+		
+	    }
+
+	   
+	    
+	}
+	return area;
+    }
+
+    
+    private void printMap(){
+	
+	String s = "";
+	for (int y = 0; y < height; y++){
+	    for (int x = 0; x < width; x++){
+		String filler = "#";
+		if (map.isPassableTerrainAt(v_map[y][x]) != 0){
+		    filler = " ";
+		}
+		
+		s += filler + " ";
+	    }
+	    s += "\n";
+	}
+	System.out.println(s);
+    }
+
+    private boolean inBounds(int x, int y){
+
+	return x >= 0 && x < width && y >= 0 && y < height;
+    }
+    
+    private void printArea(ArrayList<MapLocation> area){
+
+	int[][] int_map = new int[height][width];
+		
+	for (int i = 0; i < area.size(); i++){
+	    int x = area.get(i).getX();
+	    int y = area.get(i).getY();
+	    int_map[y][x] = 1;
+	    
+	}
+
+	
+	String s = "";
+	for (int y = 0; y < height; y++){
+	    for (int x = 0; x < width; x++){
+		String filler = "#";
+		if (int_map[y][x] == 1){
+		    filler = " ";
+		}
+		
+		s += filler + " ";
+	    }
+	    s += "\n";
+	}
+	System.out.println(s);
+	
+    }
+
+    private boolean visited(PriorityQueue<ArrayList<MapLocation>> areas, MapLocation target){
+
+	for (ArrayList<MapLocation> area: areas){
+	    if (area.contains(target)){
+		return true;
+	    }
+	}
+	return false;
+    }
+}
