@@ -2,24 +2,32 @@ import bc.*;
 import java.util.ArrayList;
 public class FactoryBot extends Bot{
 
+
+
 	public FactoryBot(GameController gc, PlanetMap pm, Unit unit, Logistics logs, MapData area){
 		super(gc,pm,unit,logs,area);
 	}
 
+	public UnitType priorityUnit(){
+		ArrayList<String> rp = area.rallyPoints();
+		if(gc.researchInfo().getLevel(UnitType.Rocket)>0)
+			if(logs.unitCount().get("Worker")<3)
+				return UnitType.Worker;
+		if(rp.size()>0){
+			int steps = area.getSteps(unit);
+			if(steps<30)
+				return UnitType.Knight;
+			else
+				return UnitType.Ranger;
+		}else
+			return UnitType.Ranger;
+	}
 	public void act(){
 		if(unit.structureIsBuilt()!=0){
 			if(area.blueprints().containsKey(id))
 				area.blueprints().remove(id);
 		}
-		if(gc.researchInfo().getLevel(UnitType.Rocket)>0){
-			if(logs.unitCount().get("Worker")<3)
-				produceUnit(UnitType.Worker);
-			else if(logs.unitCount().get("Knight")<logs.unitCount().get("Rocket")*10)
-				produceUnit(UnitType.Knight);
-		}else if(area.rallyPoints().size()>0)
-			produceUnit(UnitType.Knight);
-		else
-			produceUnit(UnitType.Ranger);
+		produceUnit(priorityUnit());
 		unloadUnit();
 	}
 
