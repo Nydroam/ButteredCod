@@ -254,7 +254,8 @@ public class WorkerBot extends Bot{
 		int threshold = area.totalKarbs()/300 + 5;
 		if( unit.abilityHeat()<unit.abilityCooldown() &&
 			gc.karbonite() > bc.bcUnitTypeReplicateCost(UnitType.Worker) &&
-			logs.unitCount().get("Worker")<threshold) {
+			logs.unitCount().get("Worker")<threshold
+			&& gc.karbonite()>logs.unitCount().get("Factory")*40) {
 			tryMove();
 			Direction d = findDirection();
 
