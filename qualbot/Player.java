@@ -18,6 +18,7 @@ public class Player{
 
         	//Queue Research Here(?)
         	gc.queueResearch(UnitType.Worker);
+        	gc.queueResearch(UnitType.Rocket);
         	//------------------Map Preprocessing---------------------
 
         	/**
@@ -25,7 +26,8 @@ public class Player{
         	 * and use their locations to set up areas in MapScanner by
         	 * using fillArea(loc). We add the unit to the corresponding
         	 * MapData created or the existing MapData.
-        	 */
+        	 */ 
+        	MissionControl mc = new MissionControl(gc);
         	MapScanner scan = new MapScanner(gc);
         	VecUnit units = gc.myUnits();
         	for(int i = 0; i < units.size(); i++){
@@ -39,7 +41,20 @@ public class Player{
 	        		scan.areas().get(index).addUnit(id);
 	        	}
         	}
+        	VecUnit enemyStarting= pm.getInitial_units();
+        	//System.out.println(enemyStarting);
+        	for(int i = 0; i < enemyStarting.size(); i++){
+        		Unit u = enemyStarting.get(i);
+        		if(u.team()==enemyTeam){
+        			MapLocation loc = u.location().mapLocation();
+        			int index = scan.findArea(loc);
+        			if(index != -1){
+        				scan.areas().get(index).rallyPoints().add(loc.toJson());
+        			}
+        		}
+        	}
         	scan.printMaps();
+
 
         	//--------------End Map Preprocessing------------------------
         	
@@ -64,7 +79,7 @@ public class Player{
 				//--------RALLY POINT SETUP-------------------------
 				
 				scan.areas().stream().forEach( area -> area.updateRallyPoints());
-				//scan.areas().stream().forEach( area -> System.out.println(area.rallyPoints().keySet()));
+				//scan.areas().stream().forEach( area -> System.out.println("Last Seen" + area.lastSeen().size() + ": "+area.lastSeen()));
 				//--------RALLY POINT END----------------------------
 
 				//------------------UNIT CODE-----------------------
@@ -74,13 +89,17 @@ public class Player{
 					//loop through our units, parsing by type
 					time = System.currentTimeMillis();
 					logs.updateUnits();
-					System.out.println("Update Time: " + (System.currentTimeMillis()-time));
-					System.out.println("PreAct");
+					//System.out.println("Update Time: " + (System.currentTimeMillis()-time));
+					//System.out.println("PreAct");
 					for(int i = 0; i < units.size(); i++){
 						Unit u = units.get(i);
 						UnitType type = u.unitType();
 						int id = u.id();
 						if(u.location().isInGarrison()){
+							int sid = u.location().structure();
+							MapData area = scan.areas().get(scan.findArea(sid));
+							if(!area.contains(id))
+								area.unitList().add(id);
 							continue;
 						}
 						MapLocation loc = u.location().mapLocation();
@@ -97,6 +116,9 @@ public class Player{
 						}
 						if(type == UnitType.Ranger){
 							bot = new RangerBot(gc,pm,u,logs,area);
+						}
+						if(type == UnitType.Rocket){
+							bot = new RocketBot(gc,pm,u,logs,area,mc);
 						}
 						time = System.currentTimeMillis();
 						

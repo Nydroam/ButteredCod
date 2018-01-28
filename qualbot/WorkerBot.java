@@ -70,24 +70,42 @@ public class WorkerBot extends Bot{
 	}
 
 	public boolean assignTarget(){
-		VecUnit factories = gc.senseNearbyUnitsByType(loc,25,UnitType.Factory); 
-		for(int i = 0; i < factories.size() ; i++){
-			Unit f = factories.get(i);
-			
-			HashMap<Integer,Integer> blueprints = area.blueprints();
-			if(blueprints.containsKey(f.id())&&blueprints.get(f.id())<4) {
-				dest = f.location().mapLocation();
-				workerTargets.put(id,dest.toJson());
-				blueprints.put(f.id(),blueprints.get(f.id())+1);
-				return true;
-			}
-			if(f.structureIsBuilt()!=0&&f.health()<f.maxHealth()){
-				dest = f.location().mapLocation();
-				workerTargets.put(id,dest.toJson());
-				return true;
-			}
+		VecUnit buildings = gc.senseNearbyUnitsByTeam(loc,25,gc.team()); 
+		for(int i = 0; i < buildings.size() ; i++){
 
+			Unit f = buildings.get(i);
+			if(f.unitType()==UnitType.Rocket||f.unitType() == UnitType.Factory){
+				HashMap<Integer,Integer> blueprints = area.blueprints();
+				if(blueprints.containsKey(f.id())&&blueprints.get(f.id())<4) {
+					dest = f.location().mapLocation();
+					workerTargets.put(id,dest.toJson());
+					blueprints.put(f.id(),blueprints.get(f.id())+1);
+					return true;
+				}
+				if(f.structureIsBuilt()!=0&&f.health()<f.maxHealth()){
+					dest = f.location().mapLocation();
+					workerTargets.put(id,dest.toJson());
+					return true;
+				}
+			}
 		}
+
+		if(gc.researchInfo().getLevel(UnitType.Rocket)>0&&
+			gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Rocket)&&
+			area.unitList().size()>10&&
+			gc.senseNearbyUnitsByTeam(loc,70,logs.enemyTeam()).size()==0 ) {
+				Direction d = Pathing.findAdjacent(loc,gc);
+				if(gc.canBlueprint(id,UnitType.Rocket,d)){
+					gc.blueprint(id,UnitType.Rocket,d);
+					Unit blueprint = gc.senseUnitAtLocation(loc.add(d));
+					area.blueprints().put(blueprint.id(),1);
+					area.unitList().add(blueprint.id());
+					dest = loc.add(d);
+					workerTargets.put(id,dest.toJson());
+					return true;
+				}
+
+			}
 
 		if(logs.unitCount().get("Factory")<(gc.karbonite())/200 +3&&
 			gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Factory)){
@@ -99,13 +117,14 @@ public class WorkerBot extends Bot{
 					Unit blueprint = gc.senseUnitAtLocation(loc.add(d));
 					area.blueprints().put(blueprint.id(),1);
 					area.unitList().add(blueprint.id());
-					logs.updateUnits();
 					dest = loc.add(d);
 					workerTargets.put(id,dest.toJson());
 					return true;
 				}
 			}
 		}
+
+		
 
 		LinkedList<MapLocation> karbQueue = area.karbQueue();
 		//System.out.println("size " + karbLocations.size());
@@ -231,7 +250,7 @@ public class WorkerBot extends Bot{
 		if(dest!=null){
 			if(gc.hasUnitAtLocation(dest)){
 				Unit u = gc.senseUnitAtLocation(dest);
-				if(u.unitType()==UnitType.Factory&&u.team()==gc.team()){
+				if((u.unitType()==UnitType.Factory || u.unitType() == UnitType.Rocket)&&u.team()==gc.team()){
 					if(u.structureIsBuilt()!=0 && u.health()==u.maxHealth()){
 
 						workerTargets.remove(id);

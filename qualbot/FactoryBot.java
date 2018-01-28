@@ -10,6 +10,10 @@ public class FactoryBot extends Bot{
 			if(area.blueprints().containsKey(id))
 				area.blueprints().remove(id);
 		}
+		if(gc.researchInfo().getLevel(UnitType.Rocket)>0){
+			if(logs.unitCount().get("Worker")<5)
+				produceUnit(UnitType.Worker);
+		}
 		produceUnit(UnitType.Ranger);
 		unloadUnit();
 	}

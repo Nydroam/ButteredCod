@@ -7,16 +7,17 @@ public class RangerBot extends Bot{
 	}
 
 	public void act(){
-		VecUnit enemyList = gc.senseNearbyUnitsByTeam(loc,unit.attackRange(),logs.enemyTeam());
-		for(int i = 0; i < enemyList.size(); i++){
-			Unit enemy = enemyList.get(i);
-			if(gc.isAttackReady(id)&&gc.canAttack(id,enemy.id())){
-				gc.attack(id,enemy.id());
-				break;
-			}
+		tryMove();
+	}
+
+	public void tryMove(){
+		if(gc.isMoveReady(id)){
+			ArrayList<Direction> dirs = area.getDirections(unit);
+			for(Direction d : dirs)
+				if(gc.canMove(id,d)){
+					gc.moveRobot(id,d);
+					break;
+				}
 		}
-		Direction d = Pathing.findAdjacent(loc,gc);
-		if(gc.isMoveReady(id))
-			tryMove(d);
 	}
 }
