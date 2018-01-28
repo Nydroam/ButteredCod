@@ -73,7 +73,7 @@ public class PlanetScanner{
 	    real_y--;
 	}
 	
-	printMap();
+	//printMap();
 	//-----------------------IGNORE-----------------------
 	/*
 	printMap();
@@ -293,7 +293,7 @@ public class PlanetScanner{
 		    }   
 		}
 	    }
-	    printAllAreas();	    
+	   // printAllAreas();	    
 	}
 	return area;
     }

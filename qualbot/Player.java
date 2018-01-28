@@ -18,6 +18,8 @@ public class Player{
 
         	//Queue Research Here(?)
         	gc.queueResearch(UnitType.Worker);
+        	gc.queueResearch(UnitType.Knight);
+        	gc.queueResearch(UnitType.Knight);
         	gc.queueResearch(UnitType.Rocket);
         	//------------------Map Preprocessing---------------------
 
@@ -116,6 +118,9 @@ public class Player{
 						}
 						if(type == UnitType.Ranger){
 							bot = new RangerBot(gc,pm,u,logs,area);
+						}
+						if(type == UnitType.Knight){
+							bot = new KnightBot(gc,pm,u,logs,area);
 						}
 						if(type == UnitType.Rocket){
 							bot = new RocketBot(gc,pm,u,logs,area,mc);

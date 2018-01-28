@@ -14,7 +14,7 @@ public class FactoryBot extends Bot{
 			if(logs.unitCount().get("Worker")<5)
 				produceUnit(UnitType.Worker);
 		}
-		produceUnit(UnitType.Ranger);
+		produceUnit(UnitType.Knight);
 		unloadUnit();
 	}
 

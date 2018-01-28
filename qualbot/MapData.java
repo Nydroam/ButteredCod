@@ -120,6 +120,9 @@ public class MapData{
 			if (contains(loc)){
 				if(enemy.unitType()==UnitType.Factory)
 					rallyPoints.add(loc.toJson());
+				else if(enemy.unitType()==UnitType.Worker&&rallyPoints.size()==0)
+					rallyPoints.add(loc.toJson());
+
 				else if(rallyPoints.size()<10&&!rallyPoints.contains(loc.toJson()))
 					rallyPoints.add(loc.toJson());
 
@@ -128,7 +131,7 @@ public class MapData{
 		ArrayList<MapLocation> rp = new ArrayList<>();
 		for(String s: rallyPoints)
 			rp.add(bc.bcMapLocationFromJson(s));
-		earthScanner = new PlanetScanner(pm,gc.planet(),rp);
+		earthScanner = new PlanetScanner(pm,gc.planet(),rp,gc);
 		earthScanner.loadVirtualMap();
 		earthScanner.buildPathMap(rp);
 	}
