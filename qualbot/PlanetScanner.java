@@ -254,7 +254,7 @@ public class PlanetScanner{
 	    }
 	}
 	if (reverse == -1){
-	    return dirsGreat;
+	    return dirsGreat.size()==0 ? dirsEqual : dirsGreat;
 	}
 	//System.out.println("x:"+l.getX()+" y:"+l.getY()+" " + dirsEqual.size() + " " + dirsLess.size());
 	return dirsLess.size()==0 ? dirsEqual : dirsLess;
