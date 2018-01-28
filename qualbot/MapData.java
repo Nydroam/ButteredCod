@@ -129,6 +129,8 @@ public class MapData{
 		for(String s: rallyPoints)
 			rp.add(bc.bcMapLocationFromJson(s));
 		earthScanner = new PlanetScanner(pm,gc.planet(),rp);
+		earthScanner.loadVirtualMap();
+		earthScanner.buildPathMap(rp);
 	}
 
 	/**
