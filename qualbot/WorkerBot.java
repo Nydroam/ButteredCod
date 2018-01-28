@@ -195,32 +195,34 @@ public class WorkerBot extends Bot{
 
 			}
 		
-
-		LinkedList<MapLocation> karbQueue = area.karbQueue();
-		//System.out.println("size " + karbLocations.size());
-		//find the closest deposit in distance
-		long time = System.currentTimeMillis();
-		//Comparator<String> comp = (loc1,loc2) -> Long.compare(bc.bcMapLocationFromJson(loc1).distanceSquaredTo(loc),bc.bcMapLocationFromJson(loc2).distanceSquaredTo(loc));
-		//Optional<String> o = karbLocations.keySet().stream().min(comp);
-		MapLocation o = null;
-		Iterator i = karbQueue.iterator();
-		int min = 5000;
-		while(i.hasNext()){
-			MapLocation l = (MapLocation)i.next();
-			int d = (int)l.distanceSquaredTo(loc);
-			if(d<min){
-				o = l;
-				min = d;
-				if(d<=10)
-					break;
+		if(gc.round()<150){
+			LinkedList<MapLocation> karbQueue = area.karbQueue();
+			//System.out.println("size " + karbLocations.size());
+			//find the closest deposit in distance
+			long time = System.currentTimeMillis();
+			//Comparator<String> comp = (loc1,loc2) -> Long.compare(bc.bcMapLocationFromJson(loc1).distanceSquaredTo(loc),bc.bcMapLocationFromJson(loc2).distanceSquaredTo(loc));
+			//Optional<String> o = karbLocations.keySet().stream().min(comp);
+			MapLocation o = null;
+			Iterator i = karbQueue.iterator();
+			int min = 5000;
+			while(i.hasNext()){
+				MapLocation l = (MapLocation)i.next();
+				int d = (int)l.distanceSquaredTo(loc);
+				if(d<min){
+					o = l;
+					min = d;
+					if(d<=10)
+						break;
+				}
 			}
-		}
-		if(o!=null){
-			dest = o;
-			workerTargets.put(id,dest.toJson());
-			karbQueue.remove(o);
-			//System.out.println("Min time: " + (System.currentTimeMillis()-time));
-			return true;
+			
+			if(o!=null){
+				dest = o;
+				workerTargets.put(id,dest.toJson());
+				karbQueue.remove(o);
+				//System.out.println("Min time: " + (System.currentTimeMillis()-time));
+				return true;
+			}
 		}
 
 		return false;
@@ -250,7 +252,7 @@ public class WorkerBot extends Bot{
 		if( unit.abilityHeat()<unit.abilityCooldown() &&
 			gc.karbonite() > bc.bcUnitTypeReplicateCost(UnitType.Worker) &&
 			logs.unitCount().get("Worker")<threshold
-			&& gc.karbonite()>logs.unitCount().get("Factory")*40) {
+			&& gc.karbonite()>logs.unitCount().get("Factory")*60) {
 			tryMove();
 			Direction d = findDirection();
 

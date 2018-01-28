@@ -10,12 +10,15 @@ public class FactoryBot extends Bot{
 
 	public UnitType priorityUnit(){
 		ArrayList<String> rp = area.rallyPoints();
-		if(gc.researchInfo().getLevel(UnitType.Rocket)>0)
-			if(logs.unitCount().get("Worker")<3)
+		if(gc.researchInfo().getLevel(UnitType.Rocket)>0){
+			if(logs.unitCount().get("Worker")<2)
 				return UnitType.Worker;
+			if(gc.karbonite()<150||gc.senseNearbyUnitsByTeam(loc,100,logs.enemyTeam()).size()>0)
+				return null;
+		}
 		if(rp.size()>0){
 			int steps = area.getSteps(unit);
-			if(steps<30)
+			if(steps<25)
 				return UnitType.Knight;
 			else
 				return UnitType.Ranger;
@@ -27,7 +30,9 @@ public class FactoryBot extends Bot{
 			if(area.blueprints().containsKey(id))
 				area.blueprints().remove(id);
 		}
-		produceUnit(priorityUnit());
+		UnitType ut = priorityUnit();
+		if(ut!=null)
+			produceUnit(ut);
 		unloadUnit();
 	}
 
