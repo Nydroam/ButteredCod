@@ -15,11 +15,11 @@ public class MissionControl{
 
 	public MapLocation getLocation(){
 		int i = (int)(Math.random()*areas.size()/4);
-		Iterator it = areas.iterator();
+		Iterator<ArrayList<MapLocation>> it = areas.iterator();
 		ArrayList<MapLocation> pls = null;
 		int count = 0;
 		while(it.hasNext()){
-			pls = (ArrayList<MapLocation>)it.next();
+			pls = it.next();
 			if(i==count)
 				break;
 			count++;

@@ -1,4 +1,5 @@
 import bc.*;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 public class Bot{
@@ -67,7 +68,7 @@ public class Bot{
 		if (type == UnitType.Mage){
 		    priorities.put(enemy, threshold + enemy.maxHealth() - enemy.health());
 		}
-	    
+
 		if (type == UnitType.Knight){
 		    if (enemy.health() <= 90){
 			priorities.put(enemy, threshold - 250 + enemy.maxHealth() - enemy.health());
@@ -75,23 +76,23 @@ public class Bot{
 			priorities.put(enemy, threshold - 600 + enemy.maxHealth() - enemy.health());
 		    }
 		}
-	    
+
 		if (type == UnitType.Healer){
 		    priorities.put(enemy, threshold - 350 + enemy.maxHealth() - enemy.health());
 		}
-	    
+
 		if (type == UnitType.Ranger){
 		    priorities.put(enemy, threshold - 800 + enemy.maxHealth() - enemy.health());
 		}
-	    
+
 		if (type == UnitType.Factory){
 		    priorities.put(enemy, threshold - 1100 + enemy.maxHealth() - enemy.health());
 		}
-	    
+
 		if (type == UnitType.Rocket){
 		    priorities.put(enemy, threshold - 1300 + enemy.maxHealth() - enemy.health());
 		}
-	    
+
 		if (type == UnitType.Worker){
 		    priorities.put(enemy, threshold - 1400 + enemy.maxHealth() - enemy.health());
 		}
@@ -103,7 +104,7 @@ public class Bot{
 		Unit enemy = entry.getKey();
 		long value = entry.getValue();
 		if (value > max){
-		    max = value;
+		    max = (int)value;
 		    target = enemy;
 		}
 	    }
@@ -113,5 +114,3 @@ public class Bot{
     }
 
 }
-
-

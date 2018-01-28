@@ -4,10 +4,9 @@
 # or if you're running in docker.
 
 # Compile our code.
-echo javac $(find . -name '*.java') -classpath ../battlecode/java
-javac $(find . -name '*.java') -classpath ../battlecode/java
+echo javac $(find . -name '*.java') -Xlint:unchecked -classpath ../battlecode/java
+javac $(find . -name '*.java') -Xlint:unchecked -classpath ../battlecode/java
 
 # Run our code.
 echo java -Xmx40m -classpath .:../battlecode/java Player
 java -Xmx40m -classpath .:../battlecode/java Player
-
