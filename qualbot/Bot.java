@@ -109,6 +109,9 @@ public class Bot{
         		    target = enemy;
         		}
     	    }
+	    if (!gc.canAttack(id, target.id())){
+		return -1;
+	    }
     	    return target.id();
     	}
     	return -1;
