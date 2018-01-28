@@ -19,6 +19,7 @@ public class WorkerBot extends Bot{
 		workerTargets = logs.workerTargets();
 	}
 	public void actMars(){
+		massReplicate();
 		if(!workerTargets.containsKey(id)){
 			if(!assignKarbTarget()){
 				tryHarvest();
@@ -95,7 +96,7 @@ public class WorkerBot extends Bot{
 				VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,50,logs.enemyTeam());
 				if(enemies.size()>0){
 					for(int i = 0; i < nearby.size(); i++)
-						if(nearby.get(i).unitType()==UnitType.Knight){
+						if(nearby.get(i).unitType()==UnitType.Knight||nearby.get(i).unitType()==UnitType.Ranger){
 							gc.disintegrateUnit(id);
 							System.out.println("DISINTEGRATION----------------");
 							return;
@@ -179,6 +180,7 @@ public class WorkerBot extends Bot{
 		}
 
 		if(logs.unitCount().get("Factory")>1&&
+			logs.unitCount().get("Rocket")<1&&
 			gc.researchInfo().getLevel(UnitType.Rocket)>0&&
 			gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Rocket)&&
 			gc.senseNearbyUnitsByTeam(loc,70,logs.enemyTeam()).size()==0 ) {
@@ -247,8 +249,27 @@ public class WorkerBot extends Bot{
 		}
 	}
 
+	public boolean massReplicate(){
+		if( unit.abilityHeat()<unit.abilityCooldown() &&
+			gc.round()>750 &&
+			gc.karbonite() > bc.bcUnitTypeReplicateCost(UnitType.Worker) ){
+			Direction[] values = Direction.values();
+
+			for(int i = 0; i < values.length; i++){
+				Direction d = values[i];
+				if(gc.canReplicate(id,d)){
+
+					gc.replicate(id,d);
+					Unit newUnit = gc.senseUnitAtLocation(loc.add(d));
+					area.addUnit(newUnit.id());
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 	public boolean tryReplicate(){
-		int threshold = area.totalKarbs()/300 + 5;
+		int threshold = area.totalKarbs()/350 + 5;
 		if( unit.abilityHeat()<unit.abilityCooldown() &&
 			gc.karbonite() > bc.bcUnitTypeReplicateCost(UnitType.Worker) &&
 			logs.unitCount().get("Worker")<threshold

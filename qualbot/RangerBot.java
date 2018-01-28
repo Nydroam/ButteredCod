@@ -8,7 +8,7 @@ public class RangerBot extends Bot{
 
 	public void act(){
 		tryAttack();
-		VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,50,logs.enemyTeam());
+		VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,35,logs.enemyTeam());
 		
 		if(enemies.size()==0){
 			tryMove();

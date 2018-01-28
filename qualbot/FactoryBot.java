@@ -3,30 +3,37 @@ import java.util.ArrayList;
 public class FactoryBot extends Bot{
 
 
-
-	public FactoryBot(GameController gc, PlanetMap pm, Unit unit, Logistics logs, MapData area){
+	private boolean rush;
+	public FactoryBot(GameController gc, PlanetMap pm, Unit unit, Logistics logs, MapData area, boolean rush){
 		super(gc,pm,unit,logs,area);
+		this.rush = rush;
 	}
 
 	public UnitType priorityUnit(){
 		ArrayList<String> rp = area.rallyPoints();
-		if(gc.researchInfo().getLevel(UnitType.Rocket)>0){
+		if(gc.researchInfo().getLevel(UnitType.Rocket)>0&&gc.senseNearbyUnitsByTeam(loc,200,logs.enemyTeam()).size()==0) {
 			if(logs.unitCount().get("Worker")<2)
 				return UnitType.Worker;
-			if(gc.karbonite()<150||gc.senseNearbyUnitsByTeam(loc,100,logs.enemyTeam()).size()>0)
+			if(gc.karbonite()<175)
 				return null;
-		}
-		if(rp.size()>0){
-			int steps = area.getSteps(unit);
-			int sumCombatUnits = logs.unitCount().get("Knight") + logs.unitCount().get("Ranger");
-			if (sumCombatUnits/3 > logs.unitCount().get("Healer") && sumCombatUnits > 20)
-				return UnitType.Healer;
-			if(steps<30)
+			if(Math.random()<0.5)
 				return UnitType.Knight;
-			else
-				return UnitType.Ranger;
-		}else
+		}
+		if(rp.size()>0&&rush){
+			
+			int units = logs.unitCount().get("Ranger") + logs.unitCount().get("Knight");
+			if(logs.unitCount().get("Healer")<units/4)
+				return UnitType.Healer;
+			int steps = area.getSteps(unit);
+			if(steps<25)
+				return UnitType.Knight;
 			return UnitType.Ranger;
+		}else{
+			int units = logs.unitCount().get("Ranger");
+			if(logs.unitCount().get("Healer")<units/3)
+				return UnitType.Healer;
+			return UnitType.Ranger;
+		}
 	}
 	public void act(){
 		if(unit.structureIsBuilt()!=0){

@@ -16,12 +16,7 @@ public class Player{
 
         if(planet == Planet.Earth){//Earth Code
 
-        	//Queue Research Here(?)
-        	gc.queueResearch(UnitType.Worker);
-        	gc.queueResearch(UnitType.Knight);
-        	gc.queueResearch(UnitType.Knight);
-        	gc.queueResearch(UnitType.Rocket);
-        	gc.queueResearch(UnitType.Knight);
+        	
         	
 
         	//gc.queueResearch(UnitType.Rocket);
@@ -59,8 +54,14 @@ public class Player{
         			}
         		}
         	}
-        	scan.printMaps();
+        	//scan.printMaps();
 
+        	scan.areas().stream().forEach( area -> {
+					area.updateRallyPoints();
+					//System.out.println("RallyPoints: " + area.rallyPoints());
+				});
+        	Strategy strats = new Strategy(gc,scan);
+        	strats.detectRush();
 
         	//--------------End Map Preprocessing------------------------
         	
@@ -71,9 +72,10 @@ public class Player{
         	 */
         	Logistics logs = new Logistics(gc);
         	//----------End Logistics Preprocessing----------------------------
-
+        	//Queue Research Here(?)
+        	Researcher  research= new Researcher(gc,logs);
         	while(true){//each iteration of the loop is a round
-
+        		research.queueResearch();
         		//initialization of variables that change each round
         		long round = gc.round();
         		int timeLeft = gc.getTimeLeftMs();
@@ -121,7 +123,7 @@ public class Player{
 							bot = new WorkerBot(gc,pm,u,logs,area);
 						}
 						if(type == UnitType.Factory){
-							bot = new FactoryBot(gc,pm,u,logs,area);
+							bot = new FactoryBot(gc,pm,u,logs,area,strats.rush());
 						}
 						if(type == UnitType.Ranger){
 							bot = new RangerBot(gc,pm,u,logs,area);
@@ -218,9 +220,6 @@ public class Player{
 						Bot bot = null;
 						if(type == UnitType.Worker){
 							bot = new WorkerBot(gc,pm,u,logs,area);
-						}
-						if(type == UnitType.Factory){
-							bot = new FactoryBot(gc,pm,u,logs,area);
 						}
 						if(type == UnitType.Ranger){
 							bot = new RangerBot(gc,pm,u,logs,area);
