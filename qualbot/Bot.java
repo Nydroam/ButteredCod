@@ -104,7 +104,7 @@ public class Bot{
     	    for (Map.Entry<Unit, Long> entry : priorities.entrySet()) {
         		Unit enemy = entry.getKey();
         		long value = entry.getValue();
-        		if (value > max){
+        		if (value > max && gc.canAttack(id, enemy.id())){
         		    max = (int)value;
         		    target = enemy;
         		}
