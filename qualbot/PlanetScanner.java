@@ -27,7 +27,7 @@ public class PlanetScanner{
     final static int SPACE = 999999998;
     final static int PAINT = 999999999;
 
-    private LinkedList<MapLocation> dests;
+    private ArrayList<MapLocation> dests;
     
     private Random rand = new Random();
     
@@ -48,7 +48,7 @@ public class PlanetScanner{
 	v_map = new Cors[height][width]; // [y][x]
     }
 
-    public PlanetScanner(PlanetMap map, Planet planet, LinkedList<MapLocation> dests){
+    public PlanetScanner(PlanetMap map, Planet planet, ArrayList<MapLocation> dests){
 	this(map, planet);
 	this.dests = dests;
     }
@@ -170,7 +170,7 @@ public class PlanetScanner{
 	    this.x=x; this.y=y;
 	}
     }
-    public void buildPathMap(LinkedList<MapLocation> dests){
+    public void buildPathMap(ArrayList<MapLocation> dests){
 	long time = System.currentTimeMillis();
         		
 	for (MapLocation dest: dests){
@@ -200,24 +200,26 @@ public class PlanetScanner{
 		prevFrontier=curFrontier;
 	    } while (curFrontier.size() > 0);
 	}
-	System.out.println("Total Time:"+ (time-System.currentTime()));
+	System.out.println("Total Time:"+ (time-System.currentTimeMillis()));
     }
 
     public ArrayList<Direction> getPathPriorityDirs(Unit unit){
 	ArrayList<Direction> dirsLess = new ArrayList<>();
 	ArrayList<Direction> dirsEqual = new ArrayList<>();
 	MapLocation l = unit.location().mapLocation();
-	Cor curcor = v_map[height-1-l.getY()][l.getX()];
+
+	TwoDimIndex curcor = new TwoDimIndex(height-1-l.getY(),l.getX());
 
 	for (int dx=-1; dx<=1; dx++){
 	    for (int dy=-1; dy<=1; dy++){
-		TwoDimIndex nextcor = new TwoDimIndex(cor.x+dx, cor.y+dy);
+		TwoDimIndex nextcor = new TwoDimIndex(curcor.x+dx, curcor.y+dy);
+		
 		if ((dx!=0 || dy!=0)){
 		    if (v_map[nextcor.y][nextcor.x].pathingPriority < v_map[curcor.y][curcor.x].pathingPriority){
-			dirsLess.add(l.locationTo(v_map[nextcor.y][nextcor.x].getLoc()));
+			dirsLess.add(l.directionTo(v_map[nextcor.y][nextcor.x].getLoc()));
 		    }
 		    else if (v_map[nextcor.y][nextcor.x].pathingPriority == v_map[curcor.y][curcor.x].pathingPriority){
-			dirsLess.add(l.locationTo(v_map[nextcor.y][nextcor.x].getLoc()));
+			dirsLess.add(l.directionTo(v_map[nextcor.y][nextcor.x].getLoc()));
 		    }
 		}
 	    }
