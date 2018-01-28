@@ -30,7 +30,8 @@ public class PlanetScanner{
     private ArrayList<MapLocation> dests;
     
     private Random rand = new Random();
-    
+
+    private GameController gc;
     private PlanetMap map;
     private Planet planet;
     private int width;
@@ -48,9 +49,10 @@ public class PlanetScanner{
 	v_map = new Cors[height][width]; // [y][x]
     }
 
-    public PlanetScanner(PlanetMap map, Planet planet, ArrayList<MapLocation> dests){
+    public PlanetScanner(PlanetMap map, Planet planet, ArrayList<MapLocation> dests, GameController gc){
 	this(map, planet);
 	this.dests = dests;
+	this.gc=gc;
     }
     
     //fill the v_map with WALL or SPACE matching Mars
@@ -216,10 +218,14 @@ public class PlanetScanner{
 		TwoDimIndex nextcor = new TwoDimIndex(curcor.x+dx, curcor.y+dy);
 		
 		if ((dx!=0 || dy!=0) && nextcor.y>=0 && nextcor.y<height && nextcor.x>=0 && nextcor.x<width){
-		    if (v_map[nextcor.y][nextcor.x].pathingPriority < v_map[curcor.y][curcor.x].pathingPriority){
+		    if (v_map[nextcor.y][nextcor.x].pathingPriority < v_map[curcor.y][curcor.x].pathingPriority
+			&& gc.canSenseLocation(v_map[nextcor.y][nextcor.x].getLoc()) &&
+			!gc.hasUnitAtLocation(v_map[nextcor.y][nextcor.x].getLoc()) ){
 			dirsLess.add(l.directionTo(v_map[nextcor.y][nextcor.x].getLoc()));
 		    }
-		    else if (v_map[nextcor.y][nextcor.x].pathingPriority == v_map[curcor.y][curcor.x].pathingPriority){
+		    else if (v_map[nextcor.y][nextcor.x].pathingPriority == v_map[curcor.y][curcor.x].pathingPriority &&
+			     gc.canSenseLocation(v_map[nextcor.y][nextcor.x].getLoc()) &&
+			     !gc.hasUnitAtLocation(v_map[nextcor.y][nextcor.x].getLoc()) ){
 			dirsEqual.add(l.directionTo(v_map[nextcor.y][nextcor.x].getLoc()));
 		    }
 		}
