@@ -1,19 +1,15 @@
 import bc.*;
 import java.util.HashMap;
 import java.util.ArrayList;
-public class RangerBot extends Bot{
-	public RangerBot(GameController gc, PlanetMap pm, Unit unit, Logistics logs, MapData area){
+public class MageBot extends Bot{
+	public MageBot(GameController gc, PlanetMap pm, Unit unit, Logistics logs, MapData area){
 		super(gc,pm,unit,logs,area);
 	}
 
 	public void act(){
 		tryAttack();
-		VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,50,logs.enemyTeam());
-		
-		if(enemies.size()==0){
-			tryMove();
-			tryAttack();
-		}
+		tryMove();
+		tryAttack();
 	}
 
 	public void tryAttack(){

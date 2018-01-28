@@ -14,7 +14,7 @@ public class MissionControl{
 	}
 
 	public MapLocation getLocation(){
-		int i = (int)(Math.random()*areas.size());
+		int i = (int)(Math.random()*areas.size()/4);
 		Iterator it = areas.iterator();
 		ArrayList<MapLocation> pls = null;
 		int count = 0;
@@ -25,7 +25,7 @@ public class MissionControl{
 			count++;
 		}
 		MapLocation loc = scanner.landRandom(pls);
-		System.out.println(loc);
+		//System.out.println(loc);
 		if(used.contains(loc.toJson()))
 			return null;
 		used.add(loc.toJson());

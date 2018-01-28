@@ -11,7 +11,8 @@ public class RocketBot extends Bot{
 		if(unit.structureIsBuilt()!=0){
 			if(area.blueprints().containsKey(id))
 				area.blueprints().remove(id);
-
+			if(!area.rallyPoints().contains(loc.toJson()))
+				area.rallyPoints().add(loc.toJson());
 
 			VecUnit inRange = gc.senseNearbyUnitsByTeam(loc,2,gc.team());
 			for(int i = 0; i < inRange.size(); i++){
@@ -23,13 +24,23 @@ public class RocketBot extends Bot{
 					}
 				}
 			}
-
-			MapLocation landingLoc = null;
-			while(landingLoc == null){
-				landingLoc = mc.getLocation();
+			if(unit.structureGarrison().size()>6||gc.round()==749||(unit.health()<unit.maxHealth()&&unit.health()!=100)){
+				MapLocation landingLoc = null;
+				while(landingLoc == null){
+					landingLoc = mc.getLocation();
+				}
+				if(gc.canLaunchRocket(id,landingLoc))
+					gc.launchRocket(id,landingLoc);
 			}
-			if(gc.canLaunchRocket(id,landingLoc))
-				gc.launchRocket(id,landingLoc);
+		}
+		
+	}
+
+	public void actMars(){
+		Direction d = Pathing.findAdjacent(loc,gc);
+		while(gc.canUnload(id,d)){
+			gc.unload(id,d);	
+			d = Pathing.findAdjacent(loc,gc);	
 		}
 	}
 }

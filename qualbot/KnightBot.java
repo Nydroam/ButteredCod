@@ -7,29 +7,35 @@ public class KnightBot extends Bot{
 	}
 
 	public void act(){
+		tryAbility();
 		tryAttack();
 		tryMove();
 		tryAttack();
+		tryAbility();
 	}
 
-	public void tryMove(){
-		if(gc.isMoveReady(id)){
-			ArrayList<Direction> dirs = area.getDirections(unit);
-			for(Direction d : dirs)
-				if(gc.canMove(id,d)){
-					gc.moveRobot(id,d);
-					break;
-				}
-		}
-	}
+	
 
 	public void tryAttack(){
 		if(gc.isAttackReady(id)){
-			VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,2,logs.enemyTeam());
+			VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,unit.attackRange(),logs.enemyTeam());
 			for(int i = 0; i < enemies.size(); i++){
 				Unit enemy = enemies.get(i);
 				if(gc.canAttack(id,enemy.id())){
 					gc.attack(id,enemy.id());
+					break;
+				}
+			}
+		}
+	}
+
+	public void tryAbility(){
+		if(unit.isAbilityUnlocked()!=0&&gc.isJavelinReady(id)){
+			VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,unit.abilityRange(),logs.enemyTeam());
+			for(int i = 0; i < enemies.size(); i++){
+				Unit enemy = enemies.get(i);
+				if(gc.canJavelin(id,enemy.id())){
+					gc.javelin(id,enemy.id());
 					break;
 				}
 			}

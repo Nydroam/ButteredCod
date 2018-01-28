@@ -18,7 +18,29 @@ public class WorkerBot extends Bot{
 		workerRally = logs.workerRally();
 		workerTargets = logs.workerTargets();
 	}
-
+	public void actMars(){
+		if(!workerTargets.containsKey(id)){
+			if(!assignKarbTarget()){
+				tryHarvest();
+				tryMove();
+				tryHarvest();
+				return;
+			}
+		}else{
+			dest = bc.bcMapLocationFromJson(workerTargets.get(id));
+		}
+		if(workerRally.containsKey(id))//assign or make a path if possible
+			paths = workerRally.get(id);
+		else if(gc.getTimeLeftMs()>7500){
+			Pathing pathing = new Pathing(gc,pm);
+			paths = pathing.aSearch(loc,dest);
+			workerRally.put(id,paths);
+		}
+		tryHarvest();
+		tryMove();
+		tryHarvest();
+		checkKarbTarget();
+	}
 	public void act(){
 		long time = System.currentTimeMillis();
 		if(!workerTargets.containsKey(id)){//if this worker does not have a target/dest
@@ -29,7 +51,17 @@ public class WorkerBot extends Bot{
 			}
 		}else{
 			dest = bc.bcMapLocationFromJson(workerTargets.get(id));
+			if(gc.karbonite()>200&&!gc.canSenseLocation(dest)){
+				area.karbQueue().offerFirst(dest);
+				if(!assignTarget()){
+					tryHarvest();
+					tryMove();
+					return;
+				}
+			}
+			
 		}
+
 		//System.out.println("Assign time: " + (System.currentTimeMillis()-time));
 		time = System.currentTimeMillis();
 		if(workerRally.containsKey(id))//assign or make a path if possible
@@ -61,6 +93,16 @@ public class WorkerBot extends Bot{
 							blueprints.put(u.id(),blueprints.get(u.id())-1);
 					}
 				}
+				VecUnit nearby = gc.senseNearbyUnitsByTeam(loc,2,gc.team());
+				VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,50,logs.enemyTeam());
+				if(enemies.size()>0){
+					for(int i = 0; i < nearby.size(); i++)
+						if(nearby.get(i).unitType()==UnitType.Knight){
+							gc.disintegrateUnit(id);
+							System.out.println("DISINTEGRATION----------------");
+							return;
+						}
+				}
 				dest = null;
 			}
 		}
@@ -68,7 +110,36 @@ public class WorkerBot extends Bot{
 		tryHarvest();
 		checkTarget();
 	}
+	public boolean assignKarbTarget(){
+		LinkedList<MapLocation> karbQueue = area.karbQueue();
+		//System.out.println("size " + karbLocations.size());
+		//find the closest deposit in distance
+		long time = System.currentTimeMillis();
+		//Comparator<String> comp = (loc1,loc2) -> Long.compare(bc.bcMapLocationFromJson(loc1).distanceSquaredTo(loc),bc.bcMapLocationFromJson(loc2).distanceSquaredTo(loc));
+		//Optional<String> o = karbLocations.keySet().stream().min(comp);
+		MapLocation o = null;
+		Iterator i = karbQueue.iterator();
+		int min = 5000;
+		while(i.hasNext()){
+			MapLocation l = (MapLocation)i.next();
+			int d = (int)l.distanceSquaredTo(loc);
+			if(d<min){
+				o = l;
+				min = d;
+				if(d<=10)
+					break;
+			}
+		}
+		if(o!=null){
+			dest = o;
+			workerTargets.put(id,dest.toJson());
+			//karbQueue.remove(o);
+			//System.out.println("Min time: " + (System.currentTimeMillis()-time));
+			return true;
+		}
 
+		return false;
+	}
 	public boolean assignTarget(){
 		VecUnit buildings = gc.senseNearbyUnitsByTeam(loc,25,gc.team()); 
 		for(int i = 0; i < buildings.size() ; i++){
@@ -92,7 +163,6 @@ public class WorkerBot extends Bot{
 
 		if(gc.researchInfo().getLevel(UnitType.Rocket)>0&&
 			gc.karbonite()>bc.bcUnitTypeBlueprintCost(UnitType.Rocket)&&
-			area.unitList().size()>10&&
 			gc.senseNearbyUnitsByTeam(loc,70,logs.enemyTeam()).size()==0 ) {
 				Direction d = Pathing.findAdjacent(loc,gc);
 				if(gc.canBlueprint(id,UnitType.Rocket,d)){
@@ -112,7 +182,7 @@ public class WorkerBot extends Bot{
 			VecUnit allies = gc.senseNearbyUnitsByTeam(loc,9,gc.team());
 			if(allies.size()>1) {
 				Direction d = Pathing.findAdjacent(loc,gc);
-				if(gc.canBlueprint(id,UnitType.Factory,d)&&Pathing.numAdjacent(loc,gc)>1){
+				if(gc.canBlueprint(id,UnitType.Factory,d)&&Pathing.numAdjacent(loc,gc)>1&&gc.senseNearbyUnitsByType(loc.add(d),2,UnitType.Factory).size()==0){
 					gc.blueprint(id,UnitType.Factory,d);
 					Unit blueprint = gc.senseUnitAtLocation(loc.add(d));
 					area.blueprints().put(blueprint.id(),1);
@@ -179,8 +249,7 @@ public class WorkerBot extends Bot{
 		int threshold = area.totalKarbs()/300 + 5;
 		if( unit.abilityHeat()<unit.abilityCooldown() &&
 			gc.karbonite() > bc.bcUnitTypeReplicateCost(UnitType.Worker) &&
-			logs.unitCount().get("Worker")<threshold &&
-			(gc.round()<=50||gc.karbonite()>logs.unitCount().get("Factory")*150)) {
+			logs.unitCount().get("Worker")<threshold) {
 			tryMove();
 			Direction d = findDirection();
 
@@ -273,6 +342,15 @@ public class WorkerBot extends Bot{
 			}
 		}
 		return true;
+	}
+
+	public boolean checkKarbTarget(){
+		if(gc.canSenseLocation(dest)&&gc.karboniteAt(dest)==0){
+			workerTargets.remove(id);
+			workerRally.remove(id);
+			return true;
+		}
+		return false;
 	}
 	
 }

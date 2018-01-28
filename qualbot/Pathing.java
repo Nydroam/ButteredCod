@@ -99,7 +99,7 @@ public class Pathing{
 				MapLocation newl = l.add(directions[i]);
 				if(pm.onMap(newl)&&gc.canSenseLocation(newl)&&gc.isOccupiable(newl)!=0){
 					d=directions[i];
-					if(Math.random()<0.2)
+					if(Math.random()<0.5)
 						return d;
 				}
 			}

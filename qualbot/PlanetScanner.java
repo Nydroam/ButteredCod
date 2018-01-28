@@ -206,6 +206,10 @@ public class PlanetScanner{
 	System.out.println("Total Time:"+ (time-System.currentTimeMillis()));
     }
 
+    public int getSteps(Unit unit){
+    	MapLocation loc = unit.location().mapLocation();
+    	return v_map[loc.getY()][loc.getX()].pathingPriority;
+    }
     public ArrayList<Direction> getPathPriorityDirs(Unit unit){
 	ArrayList<Direction> dirsLess = new ArrayList<>();
 	ArrayList<Direction> dirsEqual = new ArrayList<>();
@@ -220,18 +224,20 @@ public class PlanetScanner{
 		if ((dx!=0 || dy!=0) && nextcor.y>=0 && nextcor.y<height && nextcor.x>=0 && nextcor.x<width){
 		    if (v_map[nextcor.y][nextcor.x].pathingPriority < v_map[curcor.y][curcor.x].pathingPriority
 			&& gc.canSenseLocation(v_map[nextcor.y][nextcor.x].getLoc()) &&
-			!gc.hasUnitAtLocation(v_map[nextcor.y][nextcor.x].getLoc()) ){
+			(!gc.hasUnitAtLocation(v_map[nextcor.y][nextcor.x].getLoc())||
+			gc.senseUnitAtLocation(v_map[nextcor.y][nextcor.x].getLoc()).unitType() == UnitType.Factory )) {
 			dirsLess.add(l.directionTo(v_map[nextcor.y][nextcor.x].getLoc()));
 		    }
 		    else if (v_map[nextcor.y][nextcor.x].pathingPriority == v_map[curcor.y][curcor.x].pathingPriority &&
 			     gc.canSenseLocation(v_map[nextcor.y][nextcor.x].getLoc()) &&
-			     !gc.hasUnitAtLocation(v_map[nextcor.y][nextcor.x].getLoc()) ){
+			     (!gc.hasUnitAtLocation(v_map[nextcor.y][nextcor.x].getLoc()) ||
+			gc.senseUnitAtLocation(v_map[nextcor.y][nextcor.x].getLoc()).unitType() == UnitType.Factory )) {
 			dirsEqual.add(l.directionTo(v_map[nextcor.y][nextcor.x].getLoc()));
 		    }
 		}
 	    }
 	}
-	System.out.println("x:"+l.getX()+" y:"+l.getY()+" " + dirsEqual.size() + " " + dirsLess.size());
+	//System.out.println("x:"+l.getX()+" y:"+l.getY()+" " + dirsEqual.size() + " " + dirsLess.size());
 	return dirsLess.size()==0 ? dirsEqual : dirsLess;
     }
     

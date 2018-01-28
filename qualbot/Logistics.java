@@ -36,6 +36,7 @@ public class Logistics{
 		unitCount.put("Ranger",0);
 		unitCount.put("Knight",0);
 		unitCount.put("Mage",0);
+		unitCount.put("Healer",0);
 		unitCount.put("Factory",0);
 		unitCount.put("Rocket",0);
 	}

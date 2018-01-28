@@ -56,6 +56,10 @@ public class MapData{
 		return earthScanner.getPathPriorityDirs(u);
 	}
 
+	public int getSteps(Unit u){
+		return earthScanner.getSteps(u);
+	}
+
 	//Accessors
 	public ArrayList<String> locations() {return locations;}
 	public HashMap<String,Integer> karbLocations() {return karbLocations;}
@@ -104,7 +108,7 @@ public class MapData{
 			MapLocation loc = bc.bcMapLocationFromJson((String)it.next());
 			if(gc.canSenseLocation(loc)){
 				if(gc.hasUnitAtLocation(loc)){
-					if(gc.senseUnitAtLocation(loc).team()==gc.team())
+					if(gc.senseUnitAtLocation(loc).team()==gc.team()&&gc.senseUnitAtLocation(loc).unitType()!=UnitType.Rocket)
 						it.remove();
 				}else{
 					it.remove();

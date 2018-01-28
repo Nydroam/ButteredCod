@@ -1,4 +1,5 @@
 import bc.*;
+import java.util.ArrayList;
 public class FactoryBot extends Bot{
 
 	public FactoryBot(GameController gc, PlanetMap pm, Unit unit, Logistics logs, MapData area){
@@ -11,10 +12,14 @@ public class FactoryBot extends Bot{
 				area.blueprints().remove(id);
 		}
 		if(gc.researchInfo().getLevel(UnitType.Rocket)>0){
-			if(logs.unitCount().get("Worker")<5)
+			if(logs.unitCount().get("Worker")<3)
 				produceUnit(UnitType.Worker);
-		}
-		produceUnit(UnitType.Knight);
+			else if(logs.unitCount().get("Knight")<logs.unitCount().get("Rocket")*10)
+				produceUnit(UnitType.Knight);
+		}else if(area.rallyPoints().size()>0)
+			produceUnit(UnitType.Knight);
+		else
+			produceUnit(UnitType.Ranger);
 		unloadUnit();
 	}
 
@@ -35,6 +40,14 @@ public class FactoryBot extends Bot{
 				d = logs.workerRally().get(uid).get(loc);
 				if(d!=null&&gc.canUnload(id,d)){
 					gc.unload(id,d);
+				}
+			}
+			else{
+				ArrayList<Direction> dirs = area.getDirections(unit);
+				for(Direction di : dirs){
+					if(gc.canUnload(id,di)){
+						gc.unload(id,di);
+					}
 				}
 			}
 		}
