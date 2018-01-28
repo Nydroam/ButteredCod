@@ -37,7 +37,12 @@ public class WorkerBot extends Bot{
 			workerRally.put(id,paths);
 		}
 		tryHarvest();
-		tryMove();
+
+		if(gc.isMoveReady(id)&&!tryMove()){
+			workerTargets.remove(id);
+			workerRally.remove(id);
+			area.karbQueue().offerFirst(dest);
+		}
 		tryHarvest();
 		checkKarbTarget();
 	}
@@ -133,7 +138,7 @@ public class WorkerBot extends Bot{
 		if(o!=null){
 			dest = o;
 			workerTargets.put(id,dest.toJson());
-			//karbQueue.remove(o);
+			karbQueue.remove(o);
 			//System.out.println("Min time: " + (System.currentTimeMillis()-time));
 			return true;
 		}
@@ -153,7 +158,7 @@ public class WorkerBot extends Bot{
 					blueprints.put(f.id(),blueprints.get(f.id())+1);
 					return true;
 				}
-				if(f.structureIsBuilt()!=0&&f.health()<f.maxHealth()){
+				if(f.unitType()==UnitType.Rocket||(f.structureIsBuilt()!=0&&f.health()<f.maxHealth())) {
 					dest = f.location().mapLocation();
 					workerTargets.put(id,dest.toJson());
 					return true;
@@ -348,6 +353,7 @@ public class WorkerBot extends Bot{
 		if(gc.canSenseLocation(dest)&&gc.karboniteAt(dest)==0){
 			workerTargets.remove(id);
 			workerRally.remove(id);
+
 			return true;
 		}
 		return false;

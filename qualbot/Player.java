@@ -179,13 +179,13 @@ public class Player{
 					if(ap.hasAsteroid(round)){
 						area.locations().stream().forEach( aloc -> {
 							MapLocation aLoc = bc.bcMapLocationFromJson(aloc);
-							if(gc.canSenseLocation(aLoc)&&!area.contains(aLoc)&&gc.karboniteAt(aLoc)>0)
+							if(gc.canSenseLocation(aLoc)&&!area.karbQueue().contains(aloc)&&area.contains(aLoc)&&gc.karboniteAt(aLoc)>0)
 								area.karbQueue().push(aLoc);
 						});
 						System.out.println("striking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 						AsteroidStrike ast = ap.asteroid(round);
 						MapLocation astLoc = ast.getLocation();
-						if(area.contains(astLoc))
+						if(area.contains(astLoc)&&!area.karbQueue().contains(astLoc.toJson()))
 							area.karbQueue().push(astLoc);
 					}
 					//System.out.println("RallyPoints: " + area.rallyPoints());
