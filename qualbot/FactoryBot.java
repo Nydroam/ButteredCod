@@ -18,7 +18,10 @@ public class FactoryBot extends Bot{
 		}
 		if(rp.size()>0){
 			int steps = area.getSteps(unit);
-			if(steps<25)
+			int sumCombatUnits = logs.unitCount().get("Knight") + logs.unitCount().get("Ranger");
+			if (sumCombatUnits/3 > logs.unitCount().get("Healer") && sumCombatUnits > 20)
+				return UnitType.Healer;
+			if(steps<30)
 				return UnitType.Knight;
 			else
 				return UnitType.Ranger;
@@ -66,9 +69,9 @@ public class FactoryBot extends Bot{
 		}
 		d = Pathing.findAdjacent(loc,gc);
 		while(gc.canUnload(id,d)){
-			gc.unload(id,d);	
-			d = Pathing.findAdjacent(loc,gc);	
+			gc.unload(id,d);
+			d = Pathing.findAdjacent(loc,gc);
 		}
-	}	
+	}
 
 }
