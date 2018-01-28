@@ -17,28 +17,32 @@ public class KnightBot extends Bot{
 	
 
 	public void tryAttack(){
-		if(gc.isAttackReady(id)){
-			VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,unit.attackRange(),logs.enemyTeam());
+		
+			/*VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,unit.attackRange(),logs.enemyTeam());
 			for(int i = 0; i < enemies.size(); i++){
 				Unit enemy = enemies.get(i);
 				if(gc.canAttack(id,enemy.id())){
 					gc.attack(id,enemy.id());
 					break;
 				}
+			}*/
+			if(gc.isAttackReady(id)){
+			int enemyId = getPriorityTarget();
+			if (enemyId > -1){
+				gc.attack(id, enemyId);
 			}
-		}
+			}
+		
 	}
 
 	public void tryAbility(){
 		if(unit.isAbilityUnlocked()!=0&&gc.isJavelinReady(id)){
-			VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,unit.abilityRange(),logs.enemyTeam());
-			for(int i = 0; i < enemies.size(); i++){
-				Unit enemy = enemies.get(i);
-				if(gc.canJavelin(id,enemy.id())){
-					gc.javelin(id,enemy.id());
-					break;
-				}
+	
+			int enemyId = getPriorityTarget();
+			if (enemyId > -1){
+				gc.javelin(id, enemyId);
 			}
+		
 		}
 	}
 }
