@@ -57,11 +57,13 @@ public class PlanetScanner{
     
     //fill the v_map with WALL or SPACE matching Mars
     public void loadVirtualMap(){
+	MapLocation loc;
+	Cors cors;
 	int real_y = height - 1;
 	for (int y = 0; y < height; y++){
 	    for (int x = 0; x < width; x++){
-		MapLocation loc = new MapLocation(planet, x, y);
-		Cors cors = new Cors(loc);
+		loc = new MapLocation(planet, x, y);
+		cors = new Cors(loc);
 		if (map.isPassableTerrainAt(loc) != 0){
 		    cors.setTile(SPACE);
 		}else{
@@ -94,14 +96,15 @@ public class PlanetScanner{
 	
 	Comparator<ArrayList<MapLocation>> comp = new AreaComparator();
 	PriorityQueue<ArrayList<MapLocation>> areas = new PriorityQueue<ArrayList<MapLocation>>(10, comp);
-
+	ArrayList<MapLocation> temp;
+	
 	char area_no = (char)20;
 	for (int y = 0; y < height; y++){
 	    for (int x = 0; x < width; x++){
 		
 		if (v_map[height - 1 - y][x].getTile() == SPACE){
 		    
-		    ArrayList<MapLocation> temp = fill(x, y, areas, (int)area_no);
+		    temp = fill(x, y, areas, (int)area_no);
 		    areas.offer(temp);
 		    area_no++;
 		}
@@ -132,9 +135,10 @@ public class PlanetScanner{
 	int smallest_x = 50;
 	int biggest_y = 0;
 	int biggest_x = 0;
+	MapLocation temp;
 	
 	for (int i = 0; i < area.size(); i++){
-	    MapLocation temp = area.get(i);
+	    temp = area.get(i);
 	    if (temp.getY() < smallest_y){
 		smallest_y = temp.getY();
 	    }
@@ -174,20 +178,24 @@ public class PlanetScanner{
     }
     public void buildPathMap(ArrayList<MapLocation> dests){
 	long time = System.currentTimeMillis();
-        		
+	Cors initCor;
+	ArrayList<TwoDimIndex> prevFrontier;
+	ArrayList<TwoDimIndex> curFrontier;
+	int priority;
+	TwoDimIndex nextcor;
 	for (MapLocation dest: dests){
-	    Cors initCor = v_map[height-1-dest.getY()][dest.getX()];
-	    ArrayList<TwoDimIndex> prevFrontier = new ArrayList<>();
+	    initCor = v_map[height-1-dest.getY()][dest.getX()];
+	    prevFrontier = new ArrayList<>();
 	    prevFrontier.add(new TwoDimIndex(dest.getX(),height-1-dest.getY()));
-	    ArrayList<TwoDimIndex> curFrontier = new ArrayList<>();
-	    int priority=0;
+	    curFrontier = new ArrayList<>();
+	    priority=0;
 	    do {	    
 		curFrontier=new ArrayList<>();
 		for (TwoDimIndex cor: prevFrontier){
 		    v_map[cor.y][cor.x].pathingPriority=priority;
 		    for (int dx=-1; dx<=1; dx++){
 			for (int dy=-1; dy<=1; dy++){
-			    TwoDimIndex nextcor = new TwoDimIndex(cor.x+dx, cor.y+dy);
+			    nextcor = new TwoDimIndex(cor.x+dx, cor.y+dy);
 			    if (nextcor.y>=0 && nextcor.y<height && nextcor.x>=0 && nextcor.x<width &&
 				v_map[nextcor.y][nextcor.x].getTile()==SPACE &&
 				(v_map[nextcor.y][nextcor.x].pathingPriority==-1 || v_map[nextcor.y][nextcor.x].pathingPriority>priority+1)){
@@ -214,12 +222,12 @@ public class PlanetScanner{
 	ArrayList<Direction> dirsLess = new ArrayList<>();
 	ArrayList<Direction> dirsEqual = new ArrayList<>();
 	MapLocation l = unit.location().mapLocation();
-
+	TwoDimIndex nextcor;
 	TwoDimIndex curcor = new TwoDimIndex(l.getX(),height-1-l.getY());
 
 	for (int dx=-1; dx<=1; dx++){
 	    for (int dy=-1; dy<=1; dy++){
-		TwoDimIndex nextcor = new TwoDimIndex(curcor.x+dx, curcor.y+dy);
+		nextcor = new TwoDimIndex(curcor.x+dx, curcor.y+dy);
 		
 		if ((dx!=0 || dy!=0) && nextcor.y>=0 && nextcor.y<height && nextcor.x>=0 && nextcor.x<width){
 		    if (v_map[nextcor.y][nextcor.x].pathingPriority < v_map[curcor.y][curcor.x].pathingPriority
