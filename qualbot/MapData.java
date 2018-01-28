@@ -53,7 +53,7 @@ public class MapData{
 	}
 
 	public ArrayList<Direction> getDirections(Unit u){
-		return earthScanner.getPathPriorityDirs(u);
+	    return earthScanner.getPathPriorityDirs(u,0);
 	}
 
 	public int getSteps(Unit u){

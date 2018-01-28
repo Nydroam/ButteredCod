@@ -218,9 +218,10 @@ public class PlanetScanner{
     	MapLocation loc = unit.location().mapLocation();
     	return v_map[loc.getY()][loc.getX()].pathingPriority;
     }
-    public ArrayList<Direction> getPathPriorityDirs(Unit unit){
+    public ArrayList<Direction> getPathPriorityDirs(Unit unit, int reverse){
 	ArrayList<Direction> dirsLess = new ArrayList<>();
 	ArrayList<Direction> dirsEqual = new ArrayList<>();
+	ArrayList<Direction> dirsGreat = new ArrayList<>();
 	MapLocation l = unit.location().mapLocation();
 	TwoDimIndex nextcor;
 	TwoDimIndex curcor = new TwoDimIndex(l.getX(),height-1-l.getY());
@@ -230,6 +231,7 @@ public class PlanetScanner{
 		nextcor = new TwoDimIndex(curcor.x+dx, curcor.y+dy);
 		
 		if ((dx!=0 || dy!=0) && nextcor.y>=0 && nextcor.y<height && nextcor.x>=0 && nextcor.x<width){
+
 		    if (v_map[nextcor.y][nextcor.x].pathingPriority < v_map[curcor.y][curcor.x].pathingPriority
 			&& gc.canSenseLocation(v_map[nextcor.y][nextcor.x].getLoc()) &&
 			(!gc.hasUnitAtLocation(v_map[nextcor.y][nextcor.x].getLoc())||
@@ -242,8 +244,17 @@ public class PlanetScanner{
 			gc.senseUnitAtLocation(v_map[nextcor.y][nextcor.x].getLoc()).unitType() == UnitType.Factory )) {
 			dirsEqual.add(l.directionTo(v_map[nextcor.y][nextcor.x].getLoc()));
 		    }
+		    else if (v_map[nextcor.y][nextcor.x].pathingPriority > v_map[curcor.y][curcor.x].pathingPriority &&
+			     gc.canSenseLocation(v_map[nextcor.y][nextcor.x].getLoc()) &&
+			     (!gc.hasUnitAtLocation(v_map[nextcor.y][nextcor.x].getLoc()) ||
+			      gc.senseUnitAtLocation(v_map[nextcor.y][nextcor.x].getLoc()).unitType() == UnitType.Factory )){
+			dirsGreat.add(l.directionTo(v_map[nextcor.y][nextcor.x].getLoc()));
+		    }
 		}
 	    }
+	}
+	if (reverse == -1){
+	    return dirsGreat;
 	}
 	//System.out.println("x:"+l.getX()+" y:"+l.getY()+" " + dirsEqual.size() + " " + dirsLess.size());
 	return dirsLess.size()==0 ? dirsEqual : dirsLess;
