@@ -214,7 +214,7 @@ public class PlanetScanner{
 	    for (int dy=-1; dy<=1; dy++){
 		TwoDimIndex nextcor = new TwoDimIndex(curcor.x+dx, curcor.y+dy);
 		
-		if ((dx!=0 || dy!=0)){
+		if ((dx!=0 || dy!=0) && nextcor.y>=0 && nextcor.y<height && nextcor.x>=0 && nextcor.x<width){
 		    if (v_map[nextcor.y][nextcor.x].pathingPriority < v_map[curcor.y][curcor.x].pathingPriority){
 			dirsLess.add(l.directionTo(v_map[nextcor.y][nextcor.x].getLoc()));
 		    }
