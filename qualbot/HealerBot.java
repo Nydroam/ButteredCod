@@ -1,4 +1,5 @@
 import bc.*;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 public class HealerBot extends Bot{
@@ -16,62 +17,62 @@ public class HealerBot extends Bot{
 		}
 	}
 
-	// public int getPriorityTarget(){
-    // 	Team ourTeam = gc.team();
-    // 	VecUnit enemies = gc.senseNearbyUnitsByTeam(loc, unit.attackRange(), enemyTeam);
-    // 	if (enemies.size() > 0){
-    // 	    HashMap<Unit, Long> priorities = new HashMap<Unit, Long>();
-    // 	    long threshold = 2000;
-    // 	    for (int i = 0; i < enemies.size(); i++){
-    // 		Unit enemy = enemies.get(i);
-    // 		UnitType type = enemy.unitType();
-    // 		if (type == UnitType.Mage){
-    // 		    priorities.put(enemy, threshold + enemy.maxHealth() - enemy.health());
-    // 		}
-    //
-    // 		if (type == UnitType.Knight){
-    // 		    if (enemy.health() <= 90){
-    //                 priorities.put(enemy, threshold - 250 + enemy.maxHealth() - enemy.health());
-    // 		    }else{
-    //                 priorities.put(enemy, threshold - 600 + enemy.maxHealth() - enemy.health());
-    // 		    }
-    // 		}
-    //
-    // 		if (type == UnitType.Healer){
-    // 		    priorities.put(enemy, threshold - 350 + enemy.maxHealth() - enemy.health());
-    // 		}
-    //
-    // 		if (type == UnitType.Ranger){
-    // 		    priorities.put(enemy, threshold - 800 + enemy.maxHealth() - enemy.health());
-    // 		}
-    //
-    // 		if (type == UnitType.Factory){
-    // 		    priorities.put(enemy, threshold - 1100 + enemy.maxHealth() - enemy.health());
-    // 		}
-    //
-    // 		if (type == UnitType.Rocket){
-    // 		    priorities.put(enemy, threshold - 1300 + enemy.maxHealth() - enemy.health());
-    // 		}
-    //
-    // 		if (type == UnitType.Worker){
-    // 		    priorities.put(enemy, threshold - 1400 + enemy.maxHealth() - enemy.health());
-    // 		}
-    // 	    }
-    //
-    // 	    int max = Integer.MIN_VALUE;
-    // 	    Unit target = enemies.get(0);
-    // 	    for (Map.Entry<Unit, Long> entry : priorities.entrySet()) {
-    //     		Unit enemy = entry.getKey();
-    //     		long value = entry.getValue();
-    //     		if (value > max){
-    //     		    max = (int)value;
-    //     		    target = enemy;
-    //     		}
-    // 	    }
-    // 	    return target.id();
-    // 	}
-    // 	return -1;
-    // }
+	public int getPriorityTarget(){
+    	Team ourTeam = gc.team();
+    	VecUnit allies = gc.senseNearbyUnitsByTeam(loc, unit.attackRange(), ourTeam);
+    	if (allies.size() > 0){
+    	    HashMap<Unit, Long> priorities = new HashMap<Unit, Long>();
+    	    long threshold = 2000;
+    	    for (int i = 0; i < allies.size(); i++){
+    		Unit ally = allies.get(i);
+    		UnitType type = ally.unitType();
+    		if (type == UnitType.Mage){
+    		    priorities.put(ally, threshold + ally.maxHealth() - ally.health());
+    		}
+
+    		if (type == UnitType.Knight){
+    		    if (ally.health() <= 90){
+                    priorities.put(ally, threshold - 250 + ally.maxHealth() - ally.health());
+    		    }else{
+                    priorities.put(ally, threshold - 600 + ally.maxHealth() - ally.health());
+    		    }
+    		}
+
+    		if (type == UnitType.Healer){
+    		    priorities.put(ally, threshold - 350 + ally.maxHealth() - ally.health());
+    		}
+
+    		if (type == UnitType.Ranger){
+    		    priorities.put(ally, threshold - 800 + ally.maxHealth() - ally.health());
+    		}
+
+    		if (type == UnitType.Factory){
+    		    priorities.put(ally, threshold - 1100 + ally.maxHealth() - ally.health());
+    		}
+
+    		if (type == UnitType.Rocket){
+    		    priorities.put(ally, threshold - 1300 + ally.maxHealth() - ally.health());
+    		}
+
+    		if (type == UnitType.Worker){
+    		    priorities.put(ally, threshold - 1400 + ally.maxHealth() - ally.health());
+    		}
+    	    }
+
+    	    int max = Integer.MIN_VALUE;
+    	    Unit target = allies.get(0);
+    	    for (Map.Entry<Unit, Long> entry : priorities.entrySet()) {
+        		Unit ally = entry.getKey();
+        		long value = entry.getValue();
+        		if (value > max){
+        		    max = (int)value;
+        		    target = ally;
+        		}
+    	    }
+    	    return target.id();
+    	}
+    	return -1;
+    }
 
 
 	public void tryAttack(){
