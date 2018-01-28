@@ -17,7 +17,7 @@ public class RangerBot extends Bot{
 	}
 
 	public void tryAttack(){
-		if(gc.isAttackReady(id)){
+		/*if(gc.isAttackReady(id)){
 			VecUnit enemies = gc.senseNearbyUnitsByTeam(loc,unit.attackRange(),logs.enemyTeam());
 			for(int i = 0; i < enemies.size(); i++){
 				Unit enemy = enemies.get(i);
@@ -25,6 +25,12 @@ public class RangerBot extends Bot{
 					gc.attack(id,enemy.id());
 					break;
 				}
+			}
+		}*/
+		if(gc.isAttackReady(id)){
+			int enemyId = getPriorityTarget();
+			if (enemyId > -1){
+				gc.attack(id, enemyId);
 			}
 		}
 	}
