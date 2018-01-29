@@ -211,7 +211,7 @@ public class PlanetScanner{
 	    } while (curFrontier.size() > 0);
 	}
 	//printAllAreas();
-	System.out.println("Total Time:"+ (time-System.currentTimeMillis()));
+	//System.out.println("Total Time:"+ (time-System.currentTimeMillis()));
     }
 
     public int getSteps(Unit unit){

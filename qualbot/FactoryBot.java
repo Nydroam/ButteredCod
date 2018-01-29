@@ -22,7 +22,7 @@ public class FactoryBot extends Bot{
 		if(rp.size()>0&&rush){
 			
 			int units = logs.unitCount().get("Ranger") + logs.unitCount().get("Knight");
-			if(logs.unitCount().get("Healer")<units/4)
+			if(logs.unitCount().get("Healer")+4<units/4)
 				return UnitType.Healer;
 			int steps = area.getSteps(unit);
 			if(steps<25)
