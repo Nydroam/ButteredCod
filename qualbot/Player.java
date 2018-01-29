@@ -96,7 +96,7 @@ public class Player{
 
 				//------------------UNIT CODE-----------------------
 
-				//try{//failsafe
+				try{//failsafe
 					units = gc.myUnits();
 					//loop through our units, parsing by type
 					time = System.currentTimeMillis();
@@ -149,10 +149,10 @@ public class Player{
 						//System.out.println("Act Time: " + (System.currentTimeMillis()-time));
 					}
 					System.out.println("PostAct");
-				/*} catch(Exception e){
+				} catch(Exception e){
 					System.out.println("Exception Occurred: " + e.getMessage());
 					System.out.println(e.getStackTrace()[0]);
-				}*/
+				}
 
 				//--------------END UNIT CODE ----------------------
         		
@@ -185,7 +185,7 @@ public class Player{
 							if(gc.canSenseLocation(aLoc)&&!area.karbQueue().contains(aloc)&&area.contains(aLoc)&&gc.karboniteAt(aLoc)>0)
 								area.karbQueue().push(aLoc);
 						});
-						System.out.println("striking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+						//System.out.println("striking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 						AsteroidStrike ast = ap.asteroid(round);
 						MapLocation astLoc = ast.getLocation();
 						if(area.contains(astLoc)&&!area.karbQueue().contains(astLoc.toJson()))
@@ -193,7 +193,7 @@ public class Player{
 					}
 					//System.out.println("RallyPoints: " + area.rallyPoints());
 				});
-				//try{//failsafe
+				try{//failsafe
 					VecUnit units = gc.myUnits();
 					//loop through our units, parsing by type
 					time = System.currentTimeMillis();
@@ -245,10 +245,10 @@ public class Player{
 						//System.out.println("Act Time: " + (System.currentTimeMillis()-time));
 					}
 					System.out.println("PostAct");
-				/*} catch(Exception e){
+				} catch(Exception e){
 					System.out.println("Exception Occurred: " + e.getMessage());
 					System.out.println(e.getStackTrace()[0]);
-				}*/
+				}
 
 				//--------------END UNIT CODE ----------------------
 
