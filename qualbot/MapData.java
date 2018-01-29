@@ -138,6 +138,7 @@ public class MapData{
 		earthScanner = new PlanetScanner(pm,gc.planet(),rp,gc);
 		earthScanner.loadVirtualMap();
 		earthScanner.buildPathMap(rp);
+		earthScanner.printAllAreas();
 	}
 
 	/**

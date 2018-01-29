@@ -73,7 +73,8 @@ public class Player{
         	Logistics logs = new Logistics(gc);
         	//----------End Logistics Preprocessing----------------------------
         	//Queue Research Here(?)
-        	Researcher  research= new Researcher(gc,logs);
+        	Researcher  research= new Researcher(gc,logs,strats.rush());
+        	System.out.println("RUSHING?????: "+strats.rush());
         	while(true){//each iteration of the loop is a round
         		research.queueResearch();
         		//initialization of variables that change each round

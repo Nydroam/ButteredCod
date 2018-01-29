@@ -19,6 +19,7 @@ public class Strategy{
 		areas.stream().forEach(area -> {
 			area.unitList().stream().forEach(u->{
 				Unit unit = gc.unit(u);
+				System.out.println(area.getSteps(unit));
 				if(area.getSteps(unit)<25){
 					rush = true;
 					return;

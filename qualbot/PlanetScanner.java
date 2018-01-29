@@ -216,7 +216,7 @@ public class PlanetScanner{
 
     public int getSteps(Unit unit){
     	MapLocation loc = unit.location().mapLocation();
-    	return v_map[loc.getY()][loc.getX()].pathingPriority;
+    	return v_map[height-1-loc.getY()][loc.getX()].pathingPriority;
     }
     public ArrayList<Direction> getPathPriorityDirs(Unit unit, int reverse){
 	ArrayList<Direction> dirsLess = new ArrayList<>();
@@ -382,7 +382,7 @@ public class PlanetScanner{
 	System.out.println(s);
     }
     
-    private void printAllAreas(){
+    public void printAllAreas(){
 	String s = "";
 	for (int y = 0; y < height; y++){
 	    for (int x = 0; x < width; x++){
