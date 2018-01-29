@@ -98,7 +98,7 @@ public class WorkerBot extends Bot{
 					for(int i = 0; i < nearby.size(); i++)
 						if(nearby.get(i).unitType()==UnitType.Knight||nearby.get(i).unitType()==UnitType.Ranger){
 							gc.disintegrateUnit(id);
-							System.out.println("DISINTEGRATION----------------");
+							//System.out.println("DISINTEGRATION----------------");
 							return;
 						}
 				}
@@ -273,8 +273,8 @@ public class WorkerBot extends Bot{
 		if( unit.abilityHeat()<unit.abilityCooldown() &&
 			gc.karbonite() > bc.bcUnitTypeReplicateCost(UnitType.Worker) &&
 			logs.unitCount().get("Worker")<threshold
-			&& gc.karbonite()>logs.unitCount().get("Factory")*60 &&
-			gc.round()<200) {
+			&& gc.karbonite()>logs.unitCount().get("Factory")*40 &&
+			gc.round()<170) {
 			tryMove();
 			Direction d = findDirection();
 
