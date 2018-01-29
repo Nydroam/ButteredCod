@@ -171,6 +171,10 @@ public class Player{
         		//initialization of variables that change each round
         		long round = gc.round();
         		int timeLeft = gc.getTimeLeftMs();
+        		if(timeLeft<500){
+					gc.nextTurn();
+					continue;
+				}
         		long time = System.currentTimeMillis();
         		//printing statements for debugging
         		System.out.println("Round: "+ round);
@@ -244,7 +248,7 @@ public class Player{
 
 						//System.out.println("Act Time: " + (System.currentTimeMillis()-time));
 					}
-					System.out.println("PostAct");
+					//System.out.println("PostAct");
 				} catch(Exception e){
 					System.out.println("Exception Occurred: " + e.getMessage());
 					System.out.println(e.getStackTrace()[0]);

@@ -273,7 +273,8 @@ public class WorkerBot extends Bot{
 		if( unit.abilityHeat()<unit.abilityCooldown() &&
 			gc.karbonite() > bc.bcUnitTypeReplicateCost(UnitType.Worker) &&
 			logs.unitCount().get("Worker")<threshold
-			&& gc.karbonite()>logs.unitCount().get("Factory")*60) {
+			&& gc.karbonite()>logs.unitCount().get("Factory")*60 &&
+			gc.round()<200) {
 			tryMove();
 			Direction d = findDirection();
 
