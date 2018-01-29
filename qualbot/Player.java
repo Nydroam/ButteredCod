@@ -74,7 +74,7 @@ public class Player{
         	//----------End Logistics Preprocessing----------------------------
         	//Queue Research Here(?)
         	Researcher  research= new Researcher(gc,logs,strats.rush());
-        	System.out.println("RUSHING?????: "+strats.rush());
+        	//System.out.println("RUSHING?????: "+strats.rush());
         	while(true){//each iteration of the loop is a round
         		research.queueResearch();
         		//initialization of variables that change each round
@@ -82,8 +82,8 @@ public class Player{
         		int timeLeft = gc.getTimeLeftMs();
         		long time = System.currentTimeMillis();
         		//printing statements for debugging
-        		System.out.println("Round: "+ round);
-				System.out.println("Time Left: " + timeLeft + " ms");
+        		//System.out.println("Round: "+ round);
+				//System.out.println("Time Left: " + timeLeft + " ms");
 
 				//--------RALLY POINT SETUP-------------------------
 				
@@ -148,7 +148,7 @@ public class Player{
 
 						//System.out.println("Act Time: " + (System.currentTimeMillis()-time));
 					}
-					System.out.println("PostAct");
+					//System.out.println("PostAct");
 				} catch(Exception e){
 					System.out.println("Exception Occurred: " + e.getMessage());
 					System.out.println(e.getStackTrace()[0]);
