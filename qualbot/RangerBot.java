@@ -13,6 +13,10 @@ public class RangerBot extends Bot{
 		if(enemies.size()==0){
 			tryMove();
 			tryAttack();
+		}else{
+			if(unit.health()<unit.maxHealth()){
+				tryRetreat();
+			}
 		}
 	}
 

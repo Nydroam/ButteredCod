@@ -34,7 +34,27 @@ public class Bot{
 
     public boolean tryMove(){
     	if(gc.isMoveReady(id)){
-    	    ArrayList<Direction> dirs = area.getDirections(unit);
+    	    ArrayList<Direction> dirs = area.getDirections(unit,1);
+    	    for(Direction d : dirs){
+    		if(gc.canMove(id,d)){
+    		    gc.moveRobot(id,d);
+    		    return true;
+    		}
+    		MapLocation floc = loc.add(d);
+    		if(gc.hasUnitAtLocation(floc)){
+    		    Unit fact = gc.senseUnitAtLocation(floc);
+    		    if(fact.team()==gc.team()&&gc.canLoad(fact.id(),id)){
+    			gc.load(fact.id(),id);
+    			return true;
+    		    }
+    		}
+    	    }
+    	}
+    	return false;
+    }
+    public boolean tryRetreat(){
+    	if(gc.isMoveReady(id)){
+    	    ArrayList<Direction> dirs = area.getDirections(unit,-1);
     	    for(Direction d : dirs){
     		if(gc.canMove(id,d)){
     		    gc.moveRobot(id,d);

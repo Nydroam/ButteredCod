@@ -13,6 +13,8 @@ public class HealerBot extends Bot{
 		if(enemies.size()==0){
 			tryMove();
 			tryAttack();
+		}else{
+			tryRetreat();
 		}
 	}
 

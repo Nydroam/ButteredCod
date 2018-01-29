@@ -52,8 +52,8 @@ public class MapData{
 			enemyTeam = Team.Blue;
 	}
 
-	public ArrayList<Direction> getDirections(Unit u){
-	    return earthScanner.getPathPriorityDirs(u,0);
+	public ArrayList<Direction> getDirections(Unit u, int i){
+	    return earthScanner.getPathPriorityDirs(u,i);
 	}
 
 	public int getSteps(Unit u){

@@ -66,7 +66,7 @@ public class FactoryBot extends Bot{
 				}
 			}
 			else{
-				ArrayList<Direction> dirs = area.getDirections(unit);
+				ArrayList<Direction> dirs = area.getDirections(unit,1);
 				for(Direction di : dirs){
 					if(gc.canUnload(id,di)){
 						gc.unload(id,di);
